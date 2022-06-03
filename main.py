@@ -18,7 +18,7 @@ def photo_message(photo):
             print(f'[*] reply to photo for {user_name} in text mode')
             lines = file.readlines()
             bot.send_message(chat_id=photo.chat.id, text=f'{user_name}, {random.choice(lines)}')
-    elif number+10 % 20 == 0:
+    elif (number+10) % 20 == 0:
         with open('stickers.txt', 'r') as file:
             print(f'[*] reply to photo for {user_name} in sticker mode')
             lines = file.readlines()
