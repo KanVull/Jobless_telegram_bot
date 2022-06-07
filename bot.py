@@ -15,9 +15,8 @@ config = configparser.ConfigParser()
 counting = None
 print('[*] bot start\n')
 
-markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 btn1 = telebot.types.KeyboardButton('+1')
-markup.add(btn1)
+bot.set_chat_menu_button(menu_button=btn1)
 
 @bot.message_handler(content_types=['photo'])
 def photo_message(photo):
