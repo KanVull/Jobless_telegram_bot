@@ -30,7 +30,7 @@ def echo(message):
 
 def game_plus1(chat_id):
     score = int(os.environ.get('game_plus1')) + 1
-    os.environ['game_plus1'] = str(score)
+    os.system(f'heroku config:set game_plus1={score}')
     if score % 1000 == 0:
         print(f'[*] game +1 gain another 1000')
         bot.send_message(chat_id=chat_id, text=f'!!!{score}!!!\nНу и нечем конечно заняться парням')
