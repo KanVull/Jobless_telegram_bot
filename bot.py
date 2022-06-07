@@ -15,6 +15,10 @@ config = configparser.ConfigParser()
 counting = None
 print('[*] bot start\n')
 
+markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+btn1 = telebot.types.KeyboardButton('+1')
+markup.add(btn1)
+
 @bot.message_handler(content_types=['photo'])
 def photo_message(photo):
     number = random.randint(0,101)
@@ -67,15 +71,15 @@ def gamePlus1(message):
         bot.send_message(chat_id=message.chat.id, text=f'{user_name}, засчитано')
     elif counting[0] == user_id:
         if counting[1] == 1:
-            mess = 'скоро начнёшь превышать, дай другим тоже поиграть.\nладно, это зачту'
+            mess = 'скоро начнёшь превышать.\nЭто зачту'
             counting[1] += 1
             game_plus1(message.chat.id)
         elif counting[1] == 2:
-            mess = 'слушай, я же тебя просил. Не испытывай терпение. Засчитываю последний раз. Дай другим тоже прибавлять'
+            mess = 'слушай, я же тебя просил. Засчитываю последний раз.'
             counting[1] += 1
             game_plus1(message.chat.id)
         else:
-            mess = 'чел, ты в муте. Жди других (T_T)'
+            mess = 'чел, (T_T) Жди других'
         bot.send_message(chat_id=message.chat.id, text=f'{user_name}, {mess}')
     else:
         counting = [user_id, 1]
