@@ -1,8 +1,17 @@
 import telebot
 import random
 import os
+import configparser
+import dropbox
 
 bot = telebot.TeleBot(os.environ.get('token'), parse_mode=False)
+
+DROPBOX_ACCESS_TOKEN = os.environ.get('dropbox_key')
+dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
+dropbox_games_file_name = '/games.cfg'
+games_filename = './games.cfg'
+config = configparser.ConfigParser()
+
 counting = None
 print('[*] bot start\n')
 
@@ -29,8 +38,16 @@ def echo(message):
     bot.send_message(chat_id=message.chat.id, text=f'{user_name}, ладно')
 
 def game_plus1(chat_id):
-    score = int(os.environ.get('game_plus1')) + 1
-    os.system(f'heroku config:set game_plus1={score}')
+    with open(games_filename, 'wb') as f:
+        _, result = dbx.files_download(path=dropbox_games_file_name)
+        f.write(result.content)
+    config.read(games_filename)
+    score = int(config['GAMES']['plus1']) + 1
+    config['GAMES']['plus1'] = str(score)
+    with open(games_filename, 'w') as f:
+        config.write(f)
+    with open(games_filename, 'rb') as f:    
+        meta = dbx.files_upload(f.read(), dropbox_games_file_name, mode=dropbox.files.WriteMode("overwrite"))    
     if score % 1000 == 0:
         print(f'[*] game +1 gain another 1000')
         bot.send_message(chat_id=chat_id, text=f'!!!{score}!!!\nНу и нечем конечно заняться парням')
