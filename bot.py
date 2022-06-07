@@ -15,9 +15,6 @@ config = configparser.ConfigParser()
 counting = None
 print('[*] bot start\n')
 
-btn1 = telebot.types.KeyboardButton('+1')
-bot.set_chat_menu_button(menu_button=btn1)
-
 @bot.message_handler(content_types=['photo'])
 def photo_message(photo):
     number = random.randint(0,101)
