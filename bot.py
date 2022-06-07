@@ -1,10 +1,8 @@
 import telebot
-import configparser
 import random
+import os
 
-config_file = configparser.ConfigParser()
-config_file.read('config.cfg')
-bot = telebot.TeleBot(config_file['BOT_SETTINGS']['Token'], parse_mode=False)
+bot = telebot.TeleBot(os.environ.get('token'), parse_mode=False)
 counting = None
 print('[*] bot start\n')
 
@@ -31,10 +29,8 @@ def echo(message):
     bot.send_message(chat_id=message.chat.id, text=f'{user_name}, ладно')
 
 def game_plus1(chat_id):
-    score = int(config_file['GAMES']['Counting']) + 1
-    config_file['GAMES']['Counting'] = str(score)
-    with open('config.cfg', 'w') as configfile:
-        config_file.write(configfile)
+    score = int(os.environ.get('game_plus1')) + 1
+    os.environ['game_plus1'] = str(score)
     if score % 1000 == 0:
         print(f'[*] game +1 gain another 1000')
         bot.send_message(chat_id=chat_id, text=f'!!!{score}!!!\nНу и нечем конечно заняться парням')
