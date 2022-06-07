@@ -22,7 +22,7 @@ def photo_message(photo):
         with open('stickers.txt', 'r') as file:
             print(f'[*] reply to photo for {user_name} in sticker mode')
             lines = file.readlines()
-            bot.send_sticker(chat_id=photo.chat.id, file_id=random.choice(lines).replace('\n', ''))    
+            bot.send_sticker(photo.chat.id, random.choice(lines))
 
 @bot.message_handler(regexp=r'^([0-9]{1,})')
 def echo(message):
@@ -32,15 +32,15 @@ def echo(message):
 
 def game_plus1(chat_id):
     score = int(config_file['GAMES']['Counting']) + 1
-    config_file['GAMES']['Counting'] = str(int(config_file['GAMES']['Counting']) + 1) 
+    config_file['GAMES']['Counting'] = str(score)
     with open('config.cfg', 'w') as configfile:
         config_file.write(configfile)
     if score % 1000 == 0:
         print(f'[*] game +1 gain another 1000')
-        bot.send_message(chat_id=chat_id, text=f'!!!{score}!!!\nНу и нечем конечно заняться парням') 
+        bot.send_message(chat_id=chat_id, text=f'!!!{score}!!!\nНу и нечем конечно заняться парням')
     elif score % 50 == 0:
         print(f'[*] game +1 gain another 50')
-        bot.send_message(chat_id=chat_id, text=f'Командными усильями этот счётчик теперь {score}')     
+        bot.send_message(chat_id=chat_id, text=f'Командными усильями этот счётчик теперь {score}')
 
 @bot.message_handler(regexp=r'^(\+1)$')
 def gamePlus1(message):
@@ -57,17 +57,17 @@ def gamePlus1(message):
             mess = 'скоро начнёшь превышать, дай другим тоже поиграть.\nладно, это зачту'
             counting[1] += 1
             game_plus1(message.chat.id)
-        elif counting[1] == 2:  
-            mess = 'слушай, я же тебя просил. Не испытывай терпение. Засчитываю последний раз. Дай другим тоже прибавлять'     
+        elif counting[1] == 2:
+            mess = 'слушай, я же тебя просил. Не испытывай терпение. Засчитываю последний раз. Дай другим тоже прибавлять'
             counting[1] += 1
             game_plus1(message.chat.id)
         else:
             mess = 'чел, ты в муте. Жди других (T_T)'
-        bot.send_message(chat_id=message.chat.id, text=f'{user_name}, {mess}')        
+        bot.send_message(chat_id=message.chat.id, text=f'{user_name}, {mess}')
     else:
         counting = [user_id, 1]
         game_plus1(message.chat.id)
-        bot.send_message(chat_id=message.chat.id, text=f'{user_name}, засчитано')   
+        bot.send_message(chat_id=message.chat.id, text=f'{user_name}, засчитано')
 
 
 bot.infinity_polling()
