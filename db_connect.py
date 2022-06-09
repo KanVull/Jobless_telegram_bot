@@ -48,7 +48,7 @@ class DB_gameplus1_work():
                 self._data['player_inrow'] += 1
                 self._set_value_plus1()
             else:
-                return 4    
+                return 4, self._data['count']    
         else:
             self._data['player'] = player
             self._data['player_inrow'] = 1
