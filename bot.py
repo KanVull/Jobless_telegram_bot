@@ -5,8 +5,7 @@ import os
 import config_worker
 import logger
 
-# TELEBOT_ACCESS_TOKEN = os.environ.get('token')
-TELEBOT_ACCESS_TOKEN = '5431008591:AAFnje9oVYbmHhuzlzWJ3iRwJf1JcslLpcE'
+TELEBOT_ACCESS_TOKEN = os.environ.get('token')
 
 bot = telebot.TeleBot(TELEBOT_ACCESS_TOKEN, parse_mode=False)
 config = None
