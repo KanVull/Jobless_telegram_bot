@@ -1,5 +1,7 @@
 # project my files
 test.py
+config.ini
+games.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
