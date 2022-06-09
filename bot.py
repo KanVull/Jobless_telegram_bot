@@ -73,7 +73,7 @@ def gamePlus1(message):
             message = 'скоро начнёшь превышать.\nЭто зачту'
         case 3:
             message = 'слушай, я же тебя просил. Засчитываю последний раз.'
-        case 4:
+        case _:
             message = 'чел, (T_T) Жди других'            
     bot.send_message(chat_id=chat_id, text=f'{user_name}, {message}')
     
