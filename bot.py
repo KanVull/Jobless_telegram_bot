@@ -33,13 +33,19 @@ def photo_message(photo):
     if number % 20 == 0:
         with open(files['photo_text_answers'], 'r') as file:
             logger.log_info(f'reply to photo for {user_name} in text mode')
+            markup = telebot.types.ReplyKeyboardMarkup()
+            itembtn = telebot.types.KeyboardButton('+1')
+            markup.row(itembtn)
             lines = file.readlines()
-            bot.send_message(chat_id=chat_id, text=f'{user_name}, {random.choice(lines)}')
+            bot.send_message(chat_id=chat_id, text=f'{user_name}, {random.choice(lines)}', reply_markup=markup)
     elif (number+10) % 20 == 0:
         with open(files['photo_sticker_answers'], 'r') as file:
             logger.log_info(f'reply to photo for {user_name} in sticker mode')
+            markup = telebot.types.ReplyKeyboardMarkup()
+            itembtn = telebot.types.KeyboardButton('+1')
+            markup.row(itembtn)
             lines = file.readlines()
-            bot.send_sticker(photo.chat.id, random.choice(lines))
+            bot.send_sticker(photo.chat.id, sticker=random.choice(lines), reply_markup=markup)
 
 @bot.message_handler(regexp=r'^[0-9]')
 def echo(message):
