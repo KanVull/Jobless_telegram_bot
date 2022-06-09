@@ -16,7 +16,8 @@ files = {
     'photo_sticker_answers': './stickers.txt'
 }
 
-def mem_of_a_day(time)
+def mem_of_a_day(time):
+    pass
 
 @bot.message_handler(content_types=['photo'])
 def photo_message(photo):
