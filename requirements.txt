@@ -1,9 +1,9 @@
 certifi==2022.5.18.1
 charset-normalizer==2.0.12
-dropbox==11.31.0
 idna==3.3
 pathlib==1.0.1
 ply==3.11
+psycopg2==2.9.3
 pycryptodome==3.14.1
 pyTelegramBotAPI==4.5.1
 requests==2.27.1

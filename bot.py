@@ -4,10 +4,15 @@ import os
 
 import config_worker
 import logger
+import db_connect
 
 TELEBOT_ACCESS_TOKEN = os.environ.get('token')
+DATABASE_URL = os.environ.get('DATABASE_URL') 
 
 bot = telebot.TeleBot(TELEBOT_ACCESS_TOKEN, parse_mode=False)
+db_cn = db_connect.DB_gameplus1_work(DATABASE_URL)
+config_data = config_worker.check_enviroment()
+
 chat_id = None
 config = None
 games = None
@@ -46,7 +51,6 @@ def echo(message):
 def game_plus1(chat_id):
     score = int(config_data['games']['GAMES']['plus1']) + 1
     config_data['games']['GAMES']['plus1'] = str(score)
-    logger.log_info(f'\t\tscore: {score}')
     config_worker.save_config(config_data['games'], 'games')  
     
     if score % 1000 == 0:
@@ -59,32 +63,31 @@ def game_plus1(chat_id):
 @bot.message_handler(regexp=r'^(\+1)$')
 def gamePlus1(message):
     chat_id = message.chat.id
-    user_id = message.from_user.id
+    user_id = str(message.from_user.id)
+    state = db_cn.update_gameplus1(user_id)
     user_name = message.from_user.first_name
+    match state[0]:
+        case 1:
+            message = 'засчитано'
+        case 2:
+            message = 'скоро начнёшь превышать.\nЭто зачту'
+        case 3:
+            message = 'слушай, я же тебя просил. Засчитываю последний раз.'
+        case 4:
+            message = 'чел, (T_T) Жди других'            
+    bot.send_message(chat_id=chat_id, text=f'{user_name}, {message}')
+    
     logger.log_info(f'game +1 making for {user_name}')
-    global counting
-    if counting is not None:
-        if counting[0] == user_id:
-            if counting[1] == 1:
-                mess = 'скоро начнёшь превышать.\nЭто зачту'
-                counting[1] += 1
-                game_plus1(message.chat.id)
-            elif counting[1] == 2:
-                mess = 'слушай, я же тебя просил. Засчитываю последний раз.'
-                counting[1] += 1
-                game_plus1(message.chat.id)
-            else:
-                mess = 'чел, (T_T) Жди других'
-            bot.send_message(chat_id=chat_id, text=f'{user_name}, {mess}')
-            return
+    logger.log_info(f'\t\tscore: {state[1]}')
+    
+    if state[0] < 4:
+        if state[1] % 1000 == 0:
+            logger.log_info(f'game +1 gain another 1000')
+            bot.send_message(chat_id=chat_id, text=f'!!!{state[1]}!!!\nНу и нечем конечно заняться парням')
+    elif state[1] % 50 == 0:
+            logger.log_info(f'game +1 gain another 50')
+            bot.send_message(chat_id=chat_id, text=f'Командными усильями этот счётчик теперь {state[1]}')
 
-    counting = [user_id, 1]
-    game_plus1(chat_id)
-    bot.send_message(chat_id=chat_id, text=f'{user_name}, засчитано')
-
-
-counting = None
-config_data = config_worker.check_enviroment()
 logger.log_info(f'bot start\n')
 
 bot.infinity_polling()
