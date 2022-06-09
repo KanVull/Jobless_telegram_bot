@@ -54,18 +54,6 @@ def echo(message):
     logger.log_info(f'reply for number for {user_name}')
     bot.send_message(chat_id=chat_id, text=f'{user_name}, ладно')
 
-def game_plus1(chat_id):
-    score = int(config_data['games']['GAMES']['plus1']) + 1
-    config_data['games']['GAMES']['plus1'] = str(score)
-    config_worker.save_config(config_data['games'], 'games')  
-    
-    if score % 1000 == 0:
-        logger.log_info(f'game +1 gain another 1000')
-        bot.send_message(chat_id=chat_id, text=f'!!!{score}!!!\nНу и нечем конечно заняться парням')
-    elif score % 50 == 0:
-        logger.log_info(f'game +1 gain another 50')
-        bot.send_message(chat_id=chat_id, text=f'Командными усильями этот счётчик теперь {score}')
-
 @bot.message_handler(regexp=r'^(\+1)$')
 def gamePlus1(message):
     chat_id = message.chat.id
@@ -90,7 +78,7 @@ def gamePlus1(message):
         if state[1] % 1000 == 0:
             logger.log_info(f'game +1 gain another 1000')
             bot.send_message(chat_id=chat_id, text=f'!!!{state[1]}!!!\nНу и нечем конечно заняться парням')
-    elif state[1] % 50 == 0:
+        elif state[1] % 50 == 0:
             logger.log_info(f'game +1 gain another 50')
             bot.send_message(chat_id=chat_id, text=f'Командными усильями этот счётчик теперь {state[1]}')
 
