@@ -37,7 +37,8 @@ def photo_message(photo):
             itembtn = telebot.types.KeyboardButton('+1')
             markup.row(itembtn)
             lines = file.readlines()
-            bot.send_message(chat_id=chat_id, text=f'{user_name}, {random.choice(lines).replace("\n", "")}', reply_markup=markup)
+            message = random.choice(lines).replace("\n", "")
+            bot.send_message(chat_id=chat_id, text=f'{user_name}, {message}', reply_markup=markup)
     elif (number+10) % 20 == 0:
         with open(files['photo_sticker_answers'], 'r') as file:
             logger.log_info(f'reply to photo for {user_name} in sticker mode')
