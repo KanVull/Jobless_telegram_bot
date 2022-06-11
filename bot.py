@@ -24,29 +24,27 @@ files = {
 def mem_of_a_day(time):
     pass
 
+def dice():
+    bot.send_dice()
+
 @bot.message_handler(content_types=['photo'])
 def photo_message(photo):
     chat_id = photo.chat.id
-    number = random.randint(0,101)
+    number = random.randint(0,100)
     user_name = photo.from_user.first_name
     logger.log_info(f'photo gain {number} for {user_name}')
     if number % 20 == 0:
         with open(files['photo_text_answers'], 'r') as file:
             logger.log_info(f'reply to photo for {user_name} in text mode')
-            markup = telebot.types.ReplyKeyboardMarkup()
-            itembtn = telebot.types.KeyboardButton('+1')
-            markup.row(itembtn)
             lines = file.readlines()
-            message = random.choice(lines).replace("\n", "")
-            bot.send_message(chat_id=chat_id, text=f'{user_name}, {message}', reply_markup=markup)
+            message = random.choice(lines).replace('\n', '')
+            bot.send_message(chat_id=chat_id, text=f'{user_name}, {message}')
     elif (number+10) % 20 == 0:
         with open(files['photo_sticker_answers'], 'r') as file:
             logger.log_info(f'reply to photo for {user_name} in sticker mode')
-            markup = telebot.types.ReplyKeyboardMarkup()
-            itembtn = telebot.types.KeyboardButton('+1')
-            markup.row(itembtn)
             lines = file.readlines()
-            bot.send_sticker(chat_id=chat_id, sticker=random.choice(lines).replace('\n', ''), reply_markup=markup)
+            sticker = random.choice(lines).replace('\n', '')
+            bot.send_sticker(chat_id=chat_id, sticker=sticker)
 
 @bot.message_handler(regexp=r'^[0-9]')
 def echo(message):
@@ -55,12 +53,8 @@ def echo(message):
     logger.log_info(f'reply for number for {user_name}')
     bot.send_message(chat_id=chat_id, text=f'{user_name}, ладно')
 
-@bot.message_handler(regexp=r'^(\+1)$')
-def gamePlus1(message):
-    chat_id = message.chat.id
-    user_id = str(message.from_user.id)
+def _gamePlus1_add(user_id, chat_id, user_name):
     state = db_cn.update_gameplus1(user_id)
-    user_name = message.from_user.first_name
     match state[0]:
         case 1:
             message = 'засчитано'
@@ -76,12 +70,33 @@ def gamePlus1(message):
     logger.log_info(f'\t\tscore: {state[1]}')
     
     if state[0] < 4:
-        if state[1] % 1000 == 0:
-            logger.log_info(f'game +1 gain another 1000')
-            bot.send_message(chat_id=chat_id, text=f'!!!{state[1]}!!!\nНу и нечем конечно заняться парням')
+        sticker_state = None
+        if state[1] in [228, 256, 322, 420, 512, 666, 777, 1001, 1024, 1337, 1488, 2048]:
+            logger_message = f'game +1 gain specific {state[1]} score'
+            message = f'{state[1]} насчитали\nЩиииииииииии'
+            with open(files['photo_sticker_answers'], 'r') as file:
+                logger.log_info(f'gaining sticker for {state[1]} score')
+                lines = file.readlines()
+                sticker_state = random.choice(lines).replace('\n', '')
+        elif state[1] % 1000 == 0:
+            logger_message = f'game +1 gain another 1000'
+            message = f'!!!{state[1]}!!!\nНу и нечем конечно заняться парням'
         elif state[1] % 50 == 0:
-            logger.log_info(f'game +1 gain another 50')
-            bot.send_message(chat_id=chat_id, text=f'Командными усильями этот счётчик теперь {state[1]}')
+            logger_message = f'game +1 gain another 50'
+            message = f'Командными усильями этот счётчик теперь {state[1]}'
+
+        logger.log_info(logger_message)
+        bot.send_message(chat_id=chat_id, text=message)
+        if sticker_state is not None:
+            bot.send_sticker(chat_id=chat_id, sticker=sticker_state)
+
+@bot.message_handler(regexp=r'^(\+1)$')
+@bot.message_handler(commands=['plus'])
+def gamePlus1_byCommand(message):
+    chat_id = message.chat.id
+    user_id = str(message.from_user.id)
+    user_name = message.from_user.first_name
+    _gamePlus1_add(user_id, chat_id, user_name)     
 
 logger.log_info(f'bot start\n')
 
