@@ -24,8 +24,14 @@ files = {
 def mem_of_a_day(time):
     pass
 
-def dice():
-    bot.send_dice()
+@bot.message_handler(regexp='^(dice)$')
+@bot.message_handler(regexp='^(дайс)$')
+@bot.message_handler(commands=['dice'])
+def throw_dice(message):
+    dices = [ '🎲', '🎯', '🏀', '⚽', '🎳', '🎰']
+    dice = random.choice(dices)
+    bot.send_dice(message.chat.id, dice)
+
 
 @bot.message_handler(content_types=['photo'])
 def photo_message(photo):
