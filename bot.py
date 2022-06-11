@@ -71,6 +71,7 @@ def _gamePlus1_add(user_id, chat_id, user_name):
     
     if state[0] < 4:
         sticker_state = None
+        logger_message = None
         if state[1] in [228, 256, 322, 420, 512, 666, 777, 1001, 1024, 1337, 1488, 2048]:
             logger_message = f'game +1 gain specific {state[1]} score'
             message = f'{state[1]} насчитали\nЩиииииииииии'
@@ -85,8 +86,9 @@ def _gamePlus1_add(user_id, chat_id, user_name):
             logger_message = f'game +1 gain another 50'
             message = f'Командными усильями этот счётчик теперь {state[1]}'
 
-        logger.log_info(logger_message)
-        bot.send_message(chat_id=chat_id, text=message)
+        if logger_message is not None:
+            logger.log_info(logger_message)
+            bot.send_message(chat_id=chat_id, text=message)
         if sticker_state is not None:
             bot.send_sticker(chat_id=chat_id, sticker=sticker_state)
 
