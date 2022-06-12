@@ -1,33 +1,37 @@
 from urllib.parse import urlparse
 import psycopg2
 
-class DB_gameplus1_work():
+class DB_work():
     def __init__(self, database_url):
         result = urlparse(database_url)
-        username = result.username
-        password = result.password
-        database = result.path[1:]
-        hostname = result.hostname
-        port = result.port
         self._connection = psycopg2.connect(
-            database = database,
-            user = username,
-            password = password,
-            host = hostname,
-            port = port
+            database = result.path[1:],
+            user     = result.username,
+            password = result.password,
+            host     = result.hostname,
+            port     = result.port
         )
         self._cur = self._connection.cursor()
-        self._cur.execute("select * from gameplus1;")
-        self._data = dict(self._cur.fetchall())
-        self._data['count'] = int(self._data['count'])
-        self._data['player_inrow'] = int(self._data['player_inrow']) if self._data['player_inrow'] != '' else 0
+        
+    def random_text_answer(self):
+        self._cur.execute('select answer from text_answers order by random() limit 1;')
+        return self._cur.fetchone()[0]
 
+    def random_sticker_answer(self):
+        self._cur.execute("select answer from sticker_answers order by random() limit 1;") 
+        return self._cur.fetchone()[0]
+
+    def _get_plusoneData(self):
+        self._cur.execute("select * from gameplus1;")
+        self._data_plusone = dict(self._cur.fetchall())
+        self._data_plusone['count'] = int(self._data_plusone['count'])
+        self._data_plusone['player_inrow'] = int(self._data_plusone['player_inrow']) if self._data_plusone['player_inrow'] != '' else 0
 
     def _set_value_plus1(self):
-        self._data['count'] += 1
-        self._cur.execute(f"update gameplus1 set val = '{self._data['count']}' where var = 'count';")
-        self._cur.execute(f"update gameplus1 set val = '{self._data['player']}' where var = 'player';")
-        self._cur.execute(f"update gameplus1 set val = '{self._data['player_inrow']}' where var = 'player_inrow';")
+        self._data_plusone['count'] += 1
+        self._cur.execute(f"update gameplus1 set val = '{self._data_plusone['count']}' where var = 'count';")
+        self._cur.execute(f"update gameplus1 set val = '{self._data_plusone['player']}' where var = 'player';")
+        self._cur.execute(f"update gameplus1 set val = '{self._data_plusone['player_inrow']}' where var = 'player_inrow';")
         self._connection.commit()
 
     def update_gameplus1(self, player: str) -> tuple:
@@ -43,15 +47,15 @@ class DB_gameplus1_work():
         and 1 element:
             current count        
         '''
-        if player == self._data['player']:
-            if self._data['player_inrow'] < 3:
-                self._data['player_inrow'] += 1
+        if player == self._data_plusone['player']:
+            if self._data_plusone['player_inrow'] < 3:
+                self._data_plusone['player_inrow'] += 1
                 self._set_value_plus1()
             else:
-                return 4, self._data['count']    
+                return 4, self._data_plusone['count']    
         else:
-            self._data['player'] = player
-            self._data['player_inrow'] = 1
+            self._data_plusone['player'] = player
+            self._data_plusone['player_inrow'] = 1
             self._set_value_plus1()  
 
-        return self._data['player_inrow'], self._data['count']     
+        return self._data_plusone['player_inrow'], self._data_plusone['count']         

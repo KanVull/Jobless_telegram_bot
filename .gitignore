@@ -2,6 +2,8 @@
 test.py
 config.ini
 games.ini
+sticker_scraper.py
+sticker_add.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

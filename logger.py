@@ -7,3 +7,8 @@ def current_data():
 
 def log_info(message: str) -> None:
     print(f'[*] {current_data()} | {message}')
+def log_extrainfo(message: str) -> None:
+    print(f'[.] {current_data()} | {message}')    
+
+def empty_log() -> None:
+    print()     
