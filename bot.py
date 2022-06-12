@@ -58,7 +58,11 @@ def _gamePlus1_add(user_id, chat_id, user_name):
 def throw_dice(message):
     dices = { '🎯': 'darts', '🎲': 'dice', '🏀': 'basketball', '⚽': 'soccer', '🎳': 'bowl', '🎰': 'slots'}
     dice = random.choice(list(dices.keys()))
-    value = bot.send_dice(message.chat.id, dice)
+    value = bot.send_dice(
+        message.chat.id, 
+        dice, 
+        disable_notification=True
+    )
     value = value.dice
     logger.log_info(f'{message.from_user.first_name} roll the Dice event | {dices[dice]}')
     bot.send_chat_action(message.chat.id, 'typing')
@@ -66,19 +70,35 @@ def throw_dice(message):
     match value.emoji:
         case '🎯':
             if value.value == 6:
-                bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEU8adipe5aytwbEZx44NxBptsOdsMuqQACUhQAAjmtyEujIyiczfmW-CQE')
+                bot.send_sticker(
+                    message.chat.id, 
+                    sticker='CAACAgIAAxkBAAEU8adipe5aytwbEZx44NxBptsOdsMuqQACUhQAAjmtyEujIyiczfmW-CQE',
+                    disable_notification=True
+                )
                 logger.log_extrainfo('\tThrow 6 - great')
             elif value.value == 1:
-                bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEU8alipe7OabjAdSiFqxeSOY0zE-Y_lQACiAADZaIDLAhqiFNzxo_2JAQ')
+                bot.send_sticker(
+                    message.chat.id, 
+                    sticker='CAACAgIAAxkBAAEU8alipe7OabjAdSiFqxeSOY0zE-Y_lQACiAADZaIDLAhqiFNzxo_2JAQ', 
+                    disable_notification=True
+                )
                 logger.log_extrainfo('\tMissed')
         case '🎲':
             if value.value == 1:
-                bot.send_message(message.chat.id, text='Ну раз такое дело, пойду проверю, можешь ли ты добавить +1')
+                bot.send_message(
+                    message.chat.id, 
+                    text='Ну раз такое дело, пойду проверю, можешь ли ты добавить +1', 
+                    disable_notification=True
+                )
                 logger.log_extrainfo('\tMaking +1 by rolling the dice')
                 _gamePlus1_add(str(message.from_user.id), message.chat.id, message.from_user.first_name)
         case '🏀':
             if value.value in [4, 5]:
-                bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ')
+                bot.send_sticker(
+                    message.chat.id, 
+                    sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ',
+                    disable_notification=True
+                )
                 logger.log_extrainfo('\tMaking dunk')
         case '⚽':
             if value.value in [4, 5]:
@@ -87,26 +107,59 @@ def throw_dice(message):
                     'CAACAgIAAxkBAAEE-iZipfDeXE5xad8LNUWgcpM2GWHdiAACgAADZaIDLAABdrRv40DuhyQE',
                     'CAACAgIAAxkBAAEE-ihipfDthzT_3qRWEjrbWeZ5gAtoAgACrQADZaIDLGDZ_6CCKHo7JAQ',
                 ]
-                bot.send_sticker(message.chat.id, sticker=random.choice(stickers))
+                bot.send_sticker(
+                    message.chat.id, 
+                    sticker=random.choice(stickers),
+                    disable_notification=True
+                )
                 logger.log_extrainfo('\tGOOOOOAL')
         case '🎳':
             if value.value == 6:
-                bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ') 
+                bot.send_sticker(
+                    message.chat.id, 
+                    sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ',
+                    disable_notification=True
+                ) 
                 logger.log_extrainfo('\tHit the strike') 
             if value.value == 1:
-                bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAP8YqX_AAENorYKnbSHVTh2Y0eonKqvAAJ4DwAC_jrxSFUDk4te2W5WJAQ')
+                bot.send_sticker(
+                    message.chat.id, 
+                    sticker='CAACAgIAAxkBAAP8YqX_AAENorYKnbSHVTh2Y0eonKqvAAJ4DwAC_jrxSFUDk4te2W5WJAQ',
+                    disable_notification=True
+                )
                 logger.log_extrainfo('\tMissed') 
         case '🎰':
             if value.value == 64:
-                bot.send_message(message.chat.id, text='!!!JACKPOT!!!')
-                bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEE6AZimgghrbnEEo03sTl0JCnoHL-0NgACdBkAAlXI4Uu6jVZRP85VwCQE')
+                bot.send_message(
+                    message.chat.id, 
+                    text='!!!JACKPOT!!!',
+                    disable_notification=True
+                )
+                bot.send_sticker(
+                    message.chat.id, 
+                    sticker='CAACAgIAAxkBAAEE6AZimgghrbnEEo03sTl0JCnoHL-0NgACdBkAAlXI4Uu6jVZRP85VwCQE',
+                    disable_notification=True
+                )
                 logger.log_extrainfo('\tWinning jackpot WOW') 
             elif value.value in [43, 22, 1]:
-                bot.send_message(message.chat.id, text='Не Jackpot, но блин тоже круто')
-                bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEE_SZipgIAATrAnoBK4mz1-r9iULfgYTMAAhQWAAKAF8lL3tI17cAg9wEkBA')
+                bot.send_message(
+                    message.chat.id, 
+                    text='Не Jackpot, но блин тоже круто',
+                    disable_notification=True
+                )
+                bot.send_sticker(
+                    message.chat.id, 
+                    sticker='CAACAgIAAxkBAAEE_SZipgIAATrAnoBK4mz1-r9iULfgYTMAAhQWAAKAF8lL3tI17cAg9wEkBA',
+                    disable_notification=True
+                )
                 logger.log_extrainfo('\tThree in the row')  
             else:
-                bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEE6BpimgihzCGdTjyxel5uFJDZfqwI9AACjRMAArwbyUvBk3xJQsTnBSQE')
+                if random.randint(0,3) == 0:
+                    bot.send_sticker(
+                        message.chat.id, 
+                        sticker='CAACAgIAAxkBAAEE6BpimgihzCGdTjyxel5uFJDZfqwI9AACjRMAArwbyUvBk3xJQsTnBSQE',
+                        disable_notification=True
+                    )
                 logger.log_extrainfo('\tNothing spetial')                       
 
 
@@ -136,11 +189,19 @@ def photo_message(photo):
     if number == 4:
         logger.log_extrainfo(f'reply to photo for {user_name} in text mode')
         message = DB.random_text_answer()
-        bot.send_message(chat_id=chat_id, text=f'{user_name}, {message}')
+        bot.send_message(
+            chat_id=chat_id, 
+            text=f'{user_name}, {message}',
+            disable_notification=True
+        )
     elif number in [8,9]:
         logger.log_extrainfo(f'reply to photo for {user_name} in sticker mode')
         sticker = DB.random_sticker_answer()
-        bot.send_sticker(chat_id=chat_id, sticker=sticker)
+        bot.send_sticker(
+            chat_id=chat_id, 
+            sticker=sticker,
+            disable_notification=True
+        )
 
 
 @bot.message_handler(content_types=['video_note'])
@@ -152,7 +213,11 @@ def send_circle_reaction(video_note):
     if number in [0,3,5,7]:
         logger.log_extrainfo(f'reply to video_note for {user_name} in text mode')
         sticker = DB.random_sticker_answer()
-        bot.send_sticker(chat_id=chat_id, sticker=sticker)
+        bot.send_sticker(
+            chat_id=chat_id, 
+            sticker=sticker,
+            disable_notification=True
+        )
 
         
 logger.log_info(f'bot start\n')
