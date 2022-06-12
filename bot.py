@@ -60,28 +60,28 @@ def throw_dice(message):
     dice = random.choice(dices)
     value = bot.send_dice(message.chat.id, dice)
     value = value.dice
-    logger.log_info(f'{message.from_user.first_name} roll the dice {value["emoji"]}')
+    logger.log_info(f'{message.from_user.first_name} roll the dice {value.emoji}')
     bot.send_chat_action(message.chat.id, 'typing')
     time.sleep(1)
-    match value['emoji']:
+    match value.emoji:
         case '🎯':
-            if value['value'] == 6:
+            if value.value == 6:
                 bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEU8adipe5aytwbEZx44NxBptsOdsMuqQACUhQAAjmtyEujIyiczfmW-CQE')
                 logger.log_extrainfo('\tThrow 6 - great')
-            elif value['value'] == 1:
+            elif value.value == 1:
                 bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEU8alipe7OabjAdSiFqxeSOY0zE-Y_lQACiAADZaIDLAhqiFNzxo_2JAQ')
                 logger.log_extrainfo('\tMissed')
         case '🎲':
-            if value['value'] == 1:
+            if value.value == 1:
                 bot.send_message(message.chat.id, text='Ну раз такое дело, пойду проверю, можешь ли ты добавить +1')
                 logger.log_extrainfo('\tMaking +1 by rolling the dice')
                 _gamePlus1_add(str(message.from_user.id), message.chat.id, message.from_user.first_name)
         case '🏀':
-            if value['value'] in [4, 5]:
+            if value.value in [4, 5]:
                 bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ')
                 logger.log_extrainfo('\tMaking dunk')
         case '⚽':
-            if value['value'] in [4, 5]:
+            if value.value in [4, 5]:
                 stickers = [
                     'CAACAgIAAxkBAAEE-iRipfC9yVqeGn8Yts0Zy_tRBbtUeQACjQADZaIDLN3pznh1PLF1JAQ',
                     'CAACAgIAAxkBAAEE-iZipfDeXE5xad8LNUWgcpM2GWHdiAACgAADZaIDLAABdrRv40DuhyQE',
@@ -90,18 +90,18 @@ def throw_dice(message):
                 bot.send_sticker(message.chat.id, sticker=random.choice(stickers))
                 logger.log_extrainfo('\tGOOOOOAL')
         case '🎳':
-            if value['value'] == 6:
+            if value.value == 6:
                 bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ') 
                 logger.log_extrainfo('\tHit the strike') 
-            if value['value'] == 1:
+            if value.value == 1:
                 bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAP8YqX_AAENorYKnbSHVTh2Y0eonKqvAAJ4DwAC_jrxSFUDk4te2W5WJAQ')
                 logger.log_extrainfo('\tMissed') 
         case '🎰':
-            if value['value'] == 64:
+            if value.value == 64:
                 bot.send_message(message.chat.id, text='!!!JACKPOT!!!')
                 bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEE6AZimgghrbnEEo03sTl0JCnoHL-0NgACdBkAAlXI4Uu6jVZRP85VwCQE')
                 logger.log_extrainfo('\tWinning jackpot WOW') 
-            elif value['value'] in [43, 22, 1]:
+            elif value.value in [43, 22, 1]:
                 bot.send_message(message.chat.id, text='Не Jackpot, но блин тоже круто')
                 bot.send_sticker(message.chat.id, sticker='CAACAgIAAxkBAAEE_SZipgIAATrAnoBK4mz1-r9iULfgYTMAAhQWAAKAF8lL3tI17cAg9wEkBA')
                 logger.log_extrainfo('\tThree in the row')  
