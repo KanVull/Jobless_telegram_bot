@@ -18,7 +18,7 @@ class DB_work():
         return self._cur.fetchone()[0]
 
     def random_sticker_answer(self):
-        self._cur.execute("select answer from sticker_answers order by random() limit 1;") 
+        self._cur.execute("select id from sticker_answers order by random() limit 1;") 
         return self._cur.fetchone()[0]
 
     def _get_plusoneData(self):
