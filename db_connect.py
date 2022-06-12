@@ -25,7 +25,7 @@ class DB_work():
         self._cur.execute("select * from gameplus1;")
         data_plusone = dict(self._cur.fetchall())
         data_plusone['count'] = int(data_plusone['count'])
-        data_plusone['player_inrow'] = int(data_plusone['player_inrow']) if self._data_plusone['player_inrow'] != '' else 0
+        data_plusone['player_inrow'] = int(data_plusone['player_inrow']) if data_plusone['player_inrow'] != '' else 0
         return data_plusone
 
     def _set_value_plus1(self, newdata):
@@ -61,4 +61,4 @@ class DB_work():
             data_plusone['player_inrow'] = 1
             self._set_value_plus1(data_plusone)  
 
-        return data_plusone['player_inrow'], self._data_plusone['count']         
+        return data_plusone['player_inrow'], data_plusone['count']         
