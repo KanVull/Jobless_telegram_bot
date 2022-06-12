@@ -60,7 +60,7 @@ def throw_dice(message):
     dice = random.choice(dices)
     value = bot.send_dice(message.chat.id, dice)
     value = value.dice
-    logger.log_info(f'{message.from_user.user_name} roll the dice {value["emoji"]}')
+    logger.log_info(f'{message.from_user.first_name} roll the dice {value["emoji"]}')
     bot.send_chat_action(message.chat.id, 'typing')
     time.sleep(1)
     match value['emoji']:
