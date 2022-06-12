@@ -23,15 +23,15 @@ class DB_work():
 
     def _get_plusoneData(self):
         self._cur.execute("select * from gameplus1;")
-        self._data_plusone = dict(self._cur.fetchall())
-        self._data_plusone['count'] = int(self._data_plusone['count'])
-        self._data_plusone['player_inrow'] = int(self._data_plusone['player_inrow']) if self._data_plusone['player_inrow'] != '' else 0
+        data_plusone = dict(self._cur.fetchall())
+        data_plusone['count'] = int(data_plusone['count'])
+        data_plusone['player_inrow'] = int(data_plusone['player_inrow']) if self._data_plusone['player_inrow'] != '' else 0
+        return data_plusone
 
-    def _set_value_plus1(self):
-        self._data_plusone['count'] += 1
-        self._cur.execute(f"update gameplus1 set val = '{self._data_plusone['count']}' where var = 'count';")
-        self._cur.execute(f"update gameplus1 set val = '{self._data_plusone['player']}' where var = 'player';")
-        self._cur.execute(f"update gameplus1 set val = '{self._data_plusone['player_inrow']}' where var = 'player_inrow';")
+    def _set_value_plus1(self, newdata):
+        self._cur.execute(f"update gameplus1 set val = '{newdata['count']}' where var = 'count';")
+        self._cur.execute(f"update gameplus1 set val = '{newdata['player']}' where var = 'player';")
+        self._cur.execute(f"update gameplus1 set val = '{newdata['player_inrow']}' where var = 'player_inrow';")
         self._connection.commit()
 
     def update_gameplus1(self, player: str) -> tuple:
@@ -47,15 +47,18 @@ class DB_work():
         and 1 element:
             current count        
         '''
-        if player == self._data_plusone['player']:
-            if self._data_plusone['player_inrow'] < 3:
-                self._data_plusone['player_inrow'] += 1
-                self._set_value_plus1()
+        data_plusone = self._get_plusoneData()
+        if player == data_plusone['player']:
+            if data_plusone['player_inrow'] < 3:
+                data_plusone['count'] += 1
+                data_plusone['player_inrow'] += 1
+                self._set_value_plus1(data_plusone)
             else:
-                return 4, self._data_plusone['count']    
+                return 4, data_plusone['count']    
         else:
-            self._data_plusone['player'] = player
-            self._data_plusone['player_inrow'] = 1
-            self._set_value_plus1()  
+            data_plusone['count'] += 1
+            data_plusone['player'] = player
+            data_plusone['player_inrow'] = 1
+            self._set_value_plus1(data_plusone)  
 
-        return self._data_plusone['player_inrow'], self._data_plusone['count']         
+        return data_plusone['player_inrow'], self._data_plusone['count']         
