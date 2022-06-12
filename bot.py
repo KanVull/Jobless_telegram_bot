@@ -56,11 +56,11 @@ def _gamePlus1_add(user_id, chat_id, user_name):
 @bot.message_handler(regexp='^(дайс)$')
 @bot.message_handler(commands=['dice'])
 def throw_dice(message):
-    dices = [ '🎯', '🎲', '🏀', '⚽', '🎳', '🎰']
-    dice = random.choice(dices)
+    dices = { '🎯': 'darts', '🎲': 'dice', '🏀': 'basketball', '⚽': 'soccer', '🎳': 'bowl', '🎰': 'slots'}
+    dice = random.choice(list(dices.keys()))
     value = bot.send_dice(message.chat.id, dice)
     value = value.dice
-    logger.log_info(f'{message.from_user.first_name} roll the dice {value.emoji}')
+    logger.log_info(f'{message.from_user.first_name} roll the Dice event | {dices[dice]}')
     bot.send_chat_action(message.chat.id, 'typing')
     time.sleep(2)
     match value.emoji:
