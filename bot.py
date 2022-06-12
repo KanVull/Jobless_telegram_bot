@@ -62,7 +62,7 @@ def throw_dice(message):
     value = value.dice
     logger.log_info(f'{message.from_user.first_name} roll the dice {value.emoji}')
     bot.send_chat_action(message.chat.id, 'typing')
-    time.sleep(1)
+    time.sleep(2)
     match value.emoji:
         case '🎯':
             if value.value == 6:
