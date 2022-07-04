@@ -84,7 +84,7 @@ def _add_balance(user_id, chat_id, user_name, amount):
             message_ending = 'ов' 
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, тебе на счёт капнуло {amount} прикол{message_ending}!'
+        text=f'{user_name}, тебе на счёт капнуло {amount} прикол{message_ending}!',
         disable_notification=True
     )
 
