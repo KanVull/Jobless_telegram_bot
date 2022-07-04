@@ -120,7 +120,7 @@ def throw_dice(message):
     if not DB.pay_balance(message.from_user.id, balance_rules['pay']['dice']):
         bot.send_message(
             message.chat.id, 
-            text='Недостаточно средств для броска(', 
+            text=f"Недостаточно средств для броска(\n Стоимость: {balance_rules['pay']['dice']}", 
             disable_notification=True
         )
         return None
