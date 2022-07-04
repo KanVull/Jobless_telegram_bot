@@ -87,6 +87,7 @@ def _add_balance(user_id, chat_id, user_name, amount):
         text=f'{user_name}, тебе на счёт капнуло {amount} прикол{message_ending}!',
         disable_notification=True
     )
+    logger.log_extrainfo(f"\tAdded {amount} to balance")
 
 
 @bot.message_handler(regexp='^(баланс)$')
@@ -108,6 +109,7 @@ def get_balance(message):
         text=f'{user_name}, у тебя {amount} прикол{message_ending}!',
         disable_notification=True
     )
+    logger.log_info(f"{user_name} get_balance: {amount}")
 
 
 
@@ -115,7 +117,7 @@ def get_balance(message):
 @bot.message_handler(regexp='^(дайс)$')
 @bot.message_handler(commands=['dice'])
 def throw_dice(message):
-    if not DB.pay_balance(message.from_user.id, balance_rules['dice']):
+    if not DB.pay_balance(message.from_user.id, balance_rules['pay']['dice']):
         bot.send_message(
             message.chat.id, 
             text='Недостаточно средств для броска(', 
@@ -144,7 +146,6 @@ def throw_dice(message):
                 )
                 _add_balance(message.from_user.id, message.chat.id, message.from_user.first_name, balance_rules['add']['dice']['darts'])
                 logger.log_extrainfo('\tThrow 6 - great')
-                logger.log_extrainfo(f"\tAdded {balance_rules['add']['dice']['darts']} to balance")
             elif value.value == 1:
                 bot.send_sticker(
                     message.chat.id, 
@@ -163,7 +164,6 @@ def throw_dice(message):
                 _gamePlus1_add(str(message.from_user.id), message.chat.id, message.from_user.first_name)
             if value.value in [5, 6]:
                 _add_balance(message.from_user.id, message.chat.id, message.from_user.first_name, balance_rules['add']['dice'][f'dice{value.value}'])
-                logger.log_extrainfo(f"\tAdded {balance_rules['add']['dice'][f'dice{value.value}']} to balance")
 
         case '🏀':
             if value.value in [4, 5]:
@@ -174,7 +174,6 @@ def throw_dice(message):
                 )
                 _add_balance(message.from_user.id, message.chat.id, message.from_user.first_name, balance_rules['add']['dice']['basketball'])
                 logger.log_extrainfo('\tMaking dunk')
-                logger.log_extrainfo(f"\tAdded {balance_rules['add']['dice']['basketball']} to balance")
         case '⚽':
             if value.value in [4, 5, 6]:
                 stickers = [
@@ -189,7 +188,6 @@ def throw_dice(message):
                 )
                 _add_balance(message.from_user.id, message.chat.id, message.from_user.first_name, balance_rules['add']['dice']['soccer'])
                 logger.log_extrainfo('\tGOOOOOAL')
-                logger.log_extrainfo(f"\tAdded {balance_rules['add']['dice']['soccer']} to balance")
         case '🎳':
             if value.value == 6:
                 bot.send_sticker(
@@ -199,7 +197,6 @@ def throw_dice(message):
                 )
                 _add_balance(message.from_user.id, message.chat.id, message.from_user.first_name, balance_rules['add']['dice']['bowl']) 
                 logger.log_extrainfo('\tHit the strike') 
-                logger.log_extrainfo(f"\tAdded {balance_rules['add']['dice']['bowl']} to balance")
             if value.value == 1:
                 bot.send_sticker(
                     message.chat.id, 
@@ -221,7 +218,6 @@ def throw_dice(message):
                 )
                 _add_balance(message.from_user.id, message.chat.id, message.from_user.first_name, balance_rules['add']['dice']['slots777'])
                 logger.log_extrainfo('\tWinning jackpot WOW') 
-                logger.log_extrainfo(f"\tAdded {balance_rules['add']['dice']['slots777']} to balance")
             elif value.value in [43, 22, 1]:
                 bot.send_message(
                     message.chat.id, 
@@ -235,7 +231,6 @@ def throw_dice(message):
                 )
                 _add_balance(message.from_user.id, message.chat.id, message.from_user.first_name, balance_rules['add']['dice']['slots'])
                 logger.log_extrainfo('\tThree in the row') 
-                logger.log_extrainfo(f"\tAdded {balance_rules['add']['dice']['slots']} to balance") 
             else:
                 if random.randint(0,5) == 0:
                     bot.send_sticker(
@@ -286,8 +281,7 @@ def photo_message(photo):
             disable_notification=True
         )
     if number in [4,8]:
-        _add_balance(message.from_user.id, message.chat.id, message.from_user.first_name, balance_rules['add']['answers']['photo']) 
-        logger.log_extrainfo(f"\tAdded {balance_rules['add']['answers']['photo']} to balance")     
+        _add_balance(message.from_user.id, message.chat.id, message.from_user.first_name, balance_rules['add']['answers']['photo'])   
 
 
 @bot.message_handler(content_types=['video_note'])
@@ -305,7 +299,6 @@ def send_video_note_reaction(video_note):
             disable_notification=True
         )
         _add_balance(video_note.from_user.id, chat_id, user_name, balance_rules['add']['answers']['video_note']) 
-        logger.log_extrainfo(f"\tAdded {balance_rules['add']['answers']['video_note']} to balance")   
 
         
 logger.log_info(f'bot start\n')
