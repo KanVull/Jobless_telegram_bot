@@ -1,3 +1,4 @@
+from tkinter import N
 import telebot
 import random
 import os
@@ -111,7 +112,19 @@ def get_balance(message):
     )
     logger.log_info(f"{user_name} get_balance: {amount}")
 
-
+@bot.message_handler(regexp='^(приколы)$')
+def balance_info(message):
+    bot.send_message(
+        chat_id=message.chat.id
+        text = f'''
+            Заработать приколы можно следующими способами:\n 
+            - Если бот ответит тебе на картинку, тебе на счёт капнет - {balance_rules['add']['answers']['photo']}\n
+            - Если бот ответит на кружок, на счету появится - {balance_rules['add']['answers']['video_note']}\n
+            Также, если ты кидаешь дайс, есть вероятность, что выпадет, что-то хорошее, тогда тебе на счёт придут приколы\n\n
+            Пока что это все возможности баланса.
+        ''',
+        disable_notification=True
+    )
 
 @bot.message_handler(regexp='^(dice)$')
 @bot.message_handler(regexp='^(дайс)$')
@@ -120,7 +133,7 @@ def throw_dice(message):
     if not DB.pay_balance(message.from_user.id, balance_rules['pay']['dice']):
         bot.send_message(
             message.chat.id, 
-            text=f"Недостаточно средств для броска(\n Стоимость: {balance_rules['pay']['dice']}", 
+            text=f"Недостаточно средств для броска(\n Стоимость: {balance_rules['pay']['dice']}\nВведи \"Приколы\", чтобы узнать как их заработать", 
             disable_notification=True
         )
         return None
