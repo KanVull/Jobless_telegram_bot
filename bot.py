@@ -105,7 +105,7 @@ def get_balance(message):
             message_ending = 'ов'        
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, у тебя {amount} прикол{message_ending}!'
+        text=f'{user_name}, у тебя {amount} прикол{message_ending}!',
         disable_notification=True
     )
 
@@ -121,7 +121,7 @@ def throw_dice(message):
             text='Недостаточно средств для броска(', 
             disable_notification=True
         )
-        return
+        return None
 
     dices = { '🎯': 'darts', '🎲': 'dice', '🏀': 'basketball', '⚽': 'soccer', '🎳': 'bowl', '🎰': 'slots'}
     dice = random.choice(list(dices.keys()))
