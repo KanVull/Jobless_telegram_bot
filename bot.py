@@ -124,6 +124,7 @@ def balance_info(message):
         ''',
         disable_notification=True
     )
+    logger.log_info(f'{message.from_user.first_name} enters Приколы')
 
 @bot.message_handler(regexp='^(dice)$')
 @bot.message_handler(regexp='^(дайс)$')
@@ -135,6 +136,7 @@ def throw_dice(message):
             text=f"Недостаточно средств для броска(\n Стоимость: {balance_rules['pay']['dice']}\nВведи \"Приколы\", чтобы узнать как их заработать", 
             disable_notification=True
         )
+        logger.log_info(f'{message.from_user.first_name} doesn\'t have enough balance to dice')
         return None
 
     dices = { '🎯': 'darts', '🎲': 'dice', '🏀': 'basketball', '⚽': 'soccer', '🎳': 'bowl', '🎰': 'slots'}
