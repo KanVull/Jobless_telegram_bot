@@ -1,4 +1,3 @@
-from tkinter import N
 import telebot
 import random
 import os
