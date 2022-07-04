@@ -115,7 +115,7 @@ def get_balance(message):
 @bot.message_handler(regexp='^(приколы)$')
 def balance_info(message):
     bot.send_message(
-        chat_id=message.chat.id
+        chat_id=message.chat.id,
         text = f'''
             Заработать приколы можно следующими способами:\n 
             - Если бот ответит тебе на картинку, тебе на счёт капнет - {balance_rules['add']['answers']['photo']}\n
