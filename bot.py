@@ -350,7 +350,7 @@ def send_video_note_reaction(quick_voice_message):
 def sticker_answer(sticker):
     chat_id, user_id, user_name = _get_chat_user_info(sticker)
     logger.log_info(f'sticker gain number for {user_name}')
-    if _random([0,15], [7]):
+    if _random([0,10], [7]):
         logger.log_extrainfo(f'reply to sticker for {user_name}')
         _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['sticker']) 
   
