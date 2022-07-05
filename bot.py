@@ -341,12 +341,6 @@ def sticker_answer(sticker):
     logger.log_info(f'sticker gain number for {user_name}')
     if _random([0,10], [0,3,5,7]):
         logger.log_extrainfo(f'reply to quick_voice_message for {user_name} in text mode')
-        sticker = DB.random_sticker_answer()
-        bot.send_sticker(
-            chat_id=chat_id, 
-            sticker=sticker,
-            disable_notification=True
-        )
         _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['voice']) 
   
 
