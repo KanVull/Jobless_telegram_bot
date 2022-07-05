@@ -44,9 +44,9 @@ def readble_amount(amount):
     sAmount = str(amount)
     match sAmount[-1]:
         case '1':
-            message_ending = 'а'
+            message_ending = 'ка'
         case '2' | '3' | '4':
-            message_ending = 'и'
+            message_ending = 'ки'
         case _:
             message_ending = 'ек'        
     if len(sAmount) > 1:
