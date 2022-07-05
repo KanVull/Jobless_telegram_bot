@@ -44,15 +44,15 @@ def readble_amount(amount):
     sAmount = str(amount)
     match sAmount[-1]:
         case '1':
-            message_ending = 'ка'
+            message_ending = ''
         case '2' | '3' | '4':
-            message_ending = 'ки'
+            message_ending = 'а'
         case _:
-            message_ending = 'ек'        
+            message_ending = 'ов'        
     if len(sAmount) > 1:
         if sAmount[-2:] in ['11', '12', '13', '14']:
-            message_ending = 'ек'
-    return 'крош' + message_ending        
+            message_ending = 'ов'
+    return 'прекол' + message_ending        
 
 def _get_chat_user_info(messageObject: telebot.types.Message) -> Tuple[str, str, str]:
     chat_id = messageObject.chat.id
@@ -122,7 +122,7 @@ def get_balance(message):
     logger.log_info(f"{user_name} get_balance: {amount}")
 
 
-@bot.message_handler(regexp='^(крошки)$')
+@bot.message_handler(regexp='^(преколы)$')
 def balance_info(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     bot.send_message(
@@ -140,7 +140,7 @@ def balance_info(message):
         ''',
         disable_notification=True
     )
-    logger.log_info(f'{user_name} enters Крошки')
+    logger.log_info(f'{user_name} enters Преколы')
 
 
 @bot.message_handler(regexp='^(dice)$')
@@ -151,7 +151,7 @@ def throw_dice(message):
     if not DB.pay_balance(user_id, balance_rules['pay']['dice']):
         bot.send_message(
             chat_id, 
-            text=f"Недостаточно средств для броска(\nСтоимость: {balance_rules['pay']['dice']}\nВведи \"Крошки\", чтобы узнать как их заработать", 
+            text=f"Недостаточно средств для броска(\nСтоимость: {balance_rules['pay']['dice']}\nВведи \"Преколы\", чтобы узнать как их заработать", 
             disable_notification=True
         )
         logger.log_info(f'{user_name} doesn\'t have enough balance to dice')
