@@ -341,7 +341,7 @@ def sticker_answer(sticker):
     logger.log_info(f'sticker gain number for {user_name}')
     if _random([0,15], [7]):
         logger.log_extrainfo(f'reply to sticker for {user_name}')
-        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['voice']) 
+        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['sticker']) 
   
 
 
