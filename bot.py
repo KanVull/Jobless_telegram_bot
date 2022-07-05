@@ -40,7 +40,7 @@ balance_rules = {
     }
 }
 
-def _get_chat_user_info(messageObject) -> Tuple[str, str, str]:
+def _get_chat_user_info(messageObject: telebot.types.Message) -> Tuple[str, str, str]:
     chat_id = messageObject.chat.id
     user_id = str(messageObject.from_user.id)
     user_name = messageObject.from_user.first_name
@@ -286,7 +286,6 @@ def gamePlus1_byCommand(message):
 
 @bot.message_handler(regexp=r'^[0-9]')
 def echo(message):
-    print(type(message))
     chat_id, user_id, user_name = _get_chat_user_info(message)
     logger.log_info(f'reply for number for {user_name}')
     bot.send_message(
