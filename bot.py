@@ -23,12 +23,12 @@ balance_rules = {
         'dice': {
             'darts': 9,
             'dice5': 5,
-            'dice6': 6,
+            'dice6': 10,
             'basketball': 5,
-            'soccer': 4,
+            'soccer': 5,
             'bowl': 9,
-            'slots': 60,
-            'slots777': 300,
+            'slots': 90,
+            'slots777': 600,
         },
         'answers': {
             'photo': 3,
@@ -39,6 +39,20 @@ balance_rules = {
         
     }
 }
+
+def readble_amount(amount):
+    sAmount = str(amount)
+    match sAmount[-1]:
+        case '1':
+            message_ending = 'а'
+        case '2' | '3' | '4':
+            message_ending = 'и'
+        case _:
+            message_ending = 'ек'        
+    if len(sAmount) > 1:
+        if sAmount[-2:] in ['11', '12', '13', '14']:
+            message_ending = 'ек'
+    return 'крош' + message_ending        
 
 def _get_chat_user_info(messageObject: telebot.types.Message) -> Tuple[str, str, str]:
     chat_id = messageObject.chat.id
@@ -83,17 +97,10 @@ def _gamePlus1_add(user_id: str, chat_id: str, user_name: str) -> None:
             bot.send_sticker(chat_id=chat_id, sticker=sticker_state)
 
 def _add_balance(user_id: str, chat_id: str, user_name: str, amount: int) -> None:
-    DB.add_balance(user_id, amount)
-    match str(amount)[-1]:
-        case '1':
-            message_ending = ''
-        case '2' | '3' | '4':
-            message_ending = 'а'
-        case _:
-            message_ending = 'ов' 
+    DB.add_balance(user_id, amount)        
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, тебе на счёт капнуло {amount} прикол{message_ending}!',
+        text=f'{user_name}, тебе на счёт капнуло {amount} {readble_amount(amount)}!',
         disable_notification=True
     )
     logger.log_extrainfo(f"Added {amount} to balance")
@@ -107,44 +114,33 @@ def _random(rang: List[int], target: List[int]) -> bool:
 def get_balance(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     amount = DB.get_balance(user_id)
-    sAmount = str(amount)
-    match sAmount[-1]:
-        case '1':
-            message_ending = ''
-        case '2' | '3' | '4':
-            message_ending = 'а'
-        case _:
-            message_ending = 'ов'        
-    if len(sAmount) > 1:
-        if sAmount[-2:] in ['11', '12', '13', '14']:
-            message_ending = 'ов'
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, у тебя {amount} прикол{message_ending}!',
+        text=f'{user_name}, у тебя {amount} {readble_amount(amount)}!',
         disable_notification=True
     )
     logger.log_info(f"{user_name} get_balance: {amount}")
 
 
-@bot.message_handler(regexp='^(приколы)$')
+@bot.message_handler(regexp='^(крошки)$')
 def balance_info(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     bot.send_message(
         chat_id=chat_id,
         text = f'''
-Заработать приколы можно следующими способами:
+Накрошить крошки можно следующими способами:
 
 - Если бот ответит тебе на картинку, тебе на счёт капнет - {balance_rules['add']['answers']['photo']}
 - Если бот ответит на видео, тебе придёт - {balance_rules['add']['answers']['video']}
 - Если бот ответит на кружок или аудио, на счету появится - {balance_rules['add']['answers']['voice']}
 - Если бот ответит на стикер, то ты получишь - {balance_rules['add']['answers']['sticker']}
-Также, если ты кидаешь дайс, есть вероятность, что выпадет, что-то хорошее, тогда тебе на счёт придут приколы
+Также, если ты кидаешь дайс, есть вероятность, что выпадет, что-то хорошее, тогда тебе накрошит батон
 
 Пока что это все возможности баланса.
         ''',
         disable_notification=True
     )
-    logger.log_info(f'{user_name} enters Приколы')
+    logger.log_info(f'{user_name} enters Крошки')
 
 
 @bot.message_handler(regexp='^(dice)$')
@@ -155,7 +151,7 @@ def throw_dice(message):
     if not DB.pay_balance(user_id, balance_rules['pay']['dice']):
         bot.send_message(
             chat_id, 
-            text=f"Недостаточно средств для броска(\nСтоимость: {balance_rules['pay']['dice']}\nВведи \"Приколы\", чтобы узнать как их заработать", 
+            text=f"Недостаточно средств для броска(\nСтоимость: {balance_rules['pay']['dice']}\nВведи \"Крошки\", чтобы узнать как их заработать", 
             disable_notification=True
         )
         logger.log_info(f'{user_name} doesn\'t have enough balance to dice')
