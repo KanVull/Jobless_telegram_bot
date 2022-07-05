@@ -321,7 +321,7 @@ def photo_message(photo):
 
 
 @bot.message_handler(content_types=['video'])
-def photo_message(video):
+def video_message(video):
     chat_id, user_id, user_name = _get_chat_user_info(video)
     logger.log_info(f'video gain number for {user_name}')
     if _random([0,9], [0,3,6]):
