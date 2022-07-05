@@ -274,7 +274,7 @@ def throw_dice(message):
                         sticker='CAACAgIAAxkBAAEE6BpimgihzCGdTjyxel5uFJDZfqwI9AACjRMAArwbyUvBk3xJQsTnBSQE',
                         disable_notification=True
                     )
-                logger.log_extrainfo('Nothing spetial')                       
+                    logger.log_extrainfo('Nothing spetial')                       
 
 
 @bot.message_handler(regexp=r'^(\+1)$')
