@@ -320,6 +320,21 @@ def photo_message(photo):
         _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['photo'])   
 
 
+@bot.message_handler(content_types=['video'])
+def photo_message(video):
+    chat_id, user_id, user_name = _get_chat_user_info(video)
+    logger.log_info(f'video gain number for {user_name}')
+    if _random([0,9], [0,3,6]):
+        logger.log_extrainfo(f'reply to video for {user_name} in sticker mode')
+        sticker = DB.random_sticker_answer()
+        bot.send_sticker(
+            chat_id=chat_id, 
+            sticker=sticker,
+            disable_notification=True
+        )
+        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['photo'])   
+
+
 @bot.message_handler(content_types=['video_note', 'voice'])
 def send_video_note_reaction(quick_voice_message):
     chat_id, user_id, user_name = _get_chat_user_info(quick_voice_message)
@@ -332,7 +347,7 @@ def send_video_note_reaction(quick_voice_message):
             sticker=sticker,
             disable_notification=True
         )
-        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['voice']) 
+        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['video']) 
 
 
 @bot.message_handler(content_types=['sticker'])
