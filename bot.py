@@ -332,7 +332,7 @@ def photo_message(video):
             sticker=sticker,
             disable_notification=True
         )
-        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['photo'])   
+        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['video'])   
 
 
 @bot.message_handler(content_types=['video_note', 'voice'])
@@ -347,7 +347,7 @@ def send_video_note_reaction(quick_voice_message):
             sticker=sticker,
             disable_notification=True
         )
-        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['video']) 
+        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['voice']) 
 
 
 @bot.message_handler(content_types=['sticker'])
