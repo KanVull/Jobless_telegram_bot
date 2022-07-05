@@ -297,7 +297,7 @@ def photo_message(photo):
             disable_notification=True
         )
     if number in [4,8]:
-        _add_balance(message.from_user.id, message.chat.id, message.from_user.first_name, balance_rules['add']['answers']['photo'])   
+        _add_balance(photo.from_user.id, chat_id, user_name, balance_rules['add']['answers']['photo'])   
 
 
 @bot.message_handler(content_types=['video_note'])
