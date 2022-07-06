@@ -186,6 +186,7 @@ def throw_dice(message):
                 )
                 logger.log_extrainfo('Missed')
         case '🎲':
+            print('value soccer: ', value.value)
             if value.value == 1:
                 bot.send_message(
                     chat_id, 
