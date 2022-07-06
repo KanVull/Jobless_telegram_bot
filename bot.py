@@ -186,7 +186,6 @@ def throw_dice(message):
                 )
                 logger.log_extrainfo('Missed')
         case '🎲':
-            print('value soccer: ', value.value)
             if value.value == 1:
                 bot.send_message(
                     chat_id, 
@@ -208,6 +207,7 @@ def throw_dice(message):
                 _add_balance(user_id, chat_id, user_name, balance_rules['add']['dice']['basketball'])
                 logger.log_extrainfo('Making dunk')
         case '⚽':
+            print('value soccer: ', value.value)
             if value.value in [4, 5, 6]:
                 stickers = [
                     'CAACAgIAAxkBAAEE-iRipfC9yVqeGn8Yts0Zy_tRBbtUeQACjQADZaIDLN3pznh1PLF1JAQ',
