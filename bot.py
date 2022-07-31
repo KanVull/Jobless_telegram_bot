@@ -86,6 +86,22 @@ def _random(rang: List[int], target: List[int]) -> bool:
     ran = random.randint(rang[0], rang[1])
     return ran in target
 
+@bot.message_handler(content_types=["new_chat_members"])
+def new_member(message):
+    chat_id, user_id, user_name = _get_chat_user_info(message)
+    DB.add_user(user_id, user_name, 30)
+    bot.send_message(
+        chat_id=chat_id, 
+        text=f'{user_name}, Добро пожаловать!\nПриветственный бонус 30 преколов. Введи преколы, чтобы посмотреть как из тратить и зарабатывать',
+        disable_notification=True
+    )
+    bot.send_sticker(
+        chat_id, 
+        sticker='CAACAgIAAxkBAAEWkuti5qorkIqeTaeX0iC_TQQoI6DzqAACXRUAAmyuUEhG7eTQjfA7RykE',
+        disable_notification=True
+    )
+    logger.log_info(f"{user_name} our new user!")
+
 @bot.message_handler(regexp='^(баланс)$')
 @bot.message_handler(commands=['balance'])
 def get_balance(message):
@@ -160,6 +176,11 @@ def balance_info(message):
     bot.send_message(
         chat_id=chat_id,
         text = f'''
+Преколы это внутриботовая валюта.
+Её можно тратить на покупку уровня и азартную игру Дайс, где ты можешь выиграть преколов (или проиграть).
+Введи команду "Уровень", чтобы посмотреть информацию о данной системе.
+Введи команду "Дайс", чтобы поиграть своей удачей!
+
 Получить преколы можно следующими способами:
 
 - Если бот ответит тебе на картинку, тебе на счёт капнет - {e.readble_amount(e.get_reward('photo', user_level))}
