@@ -1,3 +1,4 @@
+from typing import Optional, Tuple
 from urllib.parse import urlparse
 import psycopg2
 
@@ -95,3 +96,24 @@ class DB_work():
         self._connection.commit() 
 
         return answer    
+
+    def get_level(self, id: str) -> Optional[str]:
+        self._cur.execute(f"select * from get_level('{id}');")
+        level_name = self._cur.fetchone()[0]
+        self._cur.execute(f"select level from person where id = '{id}';")
+        level = self._cur.fetchone()[0]
+        return (level, level_name)   
+
+    def level_up_check(self, id: str) -> bool:
+        level = self.get_level(id)[0]
+        self._cur.execute(f"select exists(select name from levels where level={level+1})")
+        return self._cur.fetchone()[0]    
+    
+    def level_up(self, id: str) -> None:
+        level = self.get_level(id)[0]
+        self._cur.execute(f"update person set level = {level+1} where id = '{id}'")
+        self._connection.commit()
+
+    def add_user(self, user_id: str, user_name: str, hello_bonus=0) -> None:
+        self._cur.execute(f"call add_user('{user_id}', '{user_name}', {hello_bonus})")
+        self._connection.commit()

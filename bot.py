@@ -6,41 +6,18 @@ import time
 
 import logger
 import db_connect
+import economy
 
 TELEBOT_ACCESS_TOKEN = os.environ.get('token')
 DATABASE_URL = os.environ.get('DATABASE_URL') 
 
 bot = telebot.TeleBot(TELEBOT_ACCESS_TOKEN, parse_mode=False)
 DB = db_connect.DB_work(DATABASE_URL)
+e = economy.Economy()
 
 chat_id = None
 
-balance_rules = {
-    'pay': {
-        'dice': 3,
-    },
-    'add': {
-        'dice': {
-            'darts': 9,
-            'dice5': 5,
-            'dice6': 10,
-            'basketball': 5,
-            'soccer': 5,
-            'bowl': 9,
-            'slots': 90,
-            'slots777': 600,
-        },
-        'answers': {
-            'photo': 3,
-            'video': 5,
-            'voice': 2,
-            'sticker': 1,
-        }
-        
-    }
-}
-
-def readble_amount(amount):
+def readble_amount_name(amount):
     sAmount = str(amount)
     match sAmount[-1]:
         case '1':
@@ -100,10 +77,10 @@ def _add_balance(user_id: str, chat_id: str, user_name: str, amount: int) -> Non
     DB.add_balance(user_id, amount)        
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, тебе на счёт капнуло {amount} {readble_amount(amount)}!',
+        text=f'{user_name}, тебе на счёт капнуло {e.readble_amount(amount)} {readble_amount_name(amount)}!',
         disable_notification=True
     )
-    logger.log_extrainfo(f"Added {amount} to balance")
+    logger.log_extrainfo(f"Added {e.readble_amount(amount)} to balance")
 
 def _random(rang: List[int], target: List[int]) -> bool:
     ran = random.randint(rang[0], rang[1])
@@ -114,27 +91,82 @@ def _random(rang: List[int], target: List[int]) -> bool:
 def get_balance(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     amount = DB.get_balance(user_id)
+    rAmount = e.readble_amount(amount)
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, у тебя {amount} {readble_amount(amount)}!',
+        text=f'{user_name}, у тебя {rAmount} {readble_amount_name(amount)}!',
         disable_notification=True
     )
-    logger.log_info(f"{user_name} get_balance: {amount}")
+    logger.log_info(f"{user_name} get_balance: {rAmount}")
+
+@bot.message_handler(regexp='^(уровень)$')
+@bot.message_handler(regexp='^(level)$')
+@bot.message_handler(commands=['level'])
+def show_level(message):
+    chat_id, user_id, user_name = _get_chat_user_info(message)
+    user_level__name = DB.get_level(user_id)
+    bot.send_message(
+        chat_id=chat_id, 
+        text=f'{user_name}, у тебя {user_level__name[0]} уровень\nТы - {user_level__name[1]}!\n \
+Чтобы перейти на следующий, напиши "Купить уровень" или воспользуйся командой бота "level_buy"',
+        disable_notification=True
+    )
+    logger.log_info(f"{user_name} show the level: {user_level__name[0]} - {user_level__name[1]}")
+
+@bot.message_handler(regexp='^(купить уровень)$')
+@bot.message_handler(commands=['level_buy'])
+def buy_level(message):
+    chat_id, user_id, user_name = _get_chat_user_info(message)
+    can_you_buy_a_new_level = DB.level_up_check(user_id)
+    if not can_you_buy_a_new_level:
+        bot.send_message(
+            chat_id=chat_id, 
+            text=f'{user_name}, у тебя максимальный на этот период уровень\nСкоро добавлю новых уровней',
+            disable_notification=True
+        )
+        bot.send_sticker(
+            chat_id, 
+            sticker='CAACAgIAAxkBAAEWkmti5pwBcvbEMlO3nNLFpdGmcnOqiAACIAADlUdhIFuwllN9RkoBKQQ',
+            disable_notification=True
+        )
+        logger.log_info(f"{user_name} trying to buy a level when the level is already max")
+    else:
+        user_level__name = DB.get_level(user_id)
+        level_cost = e.level_cost(user_level__name[0] + 1)
+        if not DB.pay_balance(user_id, level_cost):
+            bot.send_message(
+                chat_id, 
+                text=f"Недостаточно средств для покупки уровня(\nСтоимость следующего уровня: \
+{e.readble_amount(level_cost)}\nТебе не хватает {e.readble_amount(level_cost - DB.get_balance(user_id))}", 
+                disable_notification=True
+            )
+            logger.log_info(f'{user_name} doesn\'t have enough balance to level_up')
+            return None
+        DB.level_up(user_id)
+        user_level__name = DB.get_level(user_id)    
+        bot.send_message(
+            chat_id=chat_id, 
+            text=f'{user_name}, поздравляю, теперь у тебя {user_level__name[0]} уровень.\nТы - {user_level__name[1]}',
+            disable_notification=True
+        )
+        logger.log_info(f"{user_name} rise level to {user_level__name[0]}")
+        logger.log_extrainfo(f"Now the level is {user_level__name[1]}")
 
 
 @bot.message_handler(regexp='^(преколы)$')
 def balance_info(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
+    user_level = DB.get_level(user_id)[0]
     bot.send_message(
         chat_id=chat_id,
         text = f'''
-Накрошить крошки можно следующими способами:
+Получить преколы можно следующими способами:
 
-- Если бот ответит тебе на картинку, тебе на счёт капнет - {balance_rules['add']['answers']['photo']}
-- Если бот ответит на видео, тебе придёт - {balance_rules['add']['answers']['video']}
-- Если бот ответит на кружок или аудио, на счету появится - {balance_rules['add']['answers']['voice']}
-- Если бот ответит на стикер, то ты получишь - {balance_rules['add']['answers']['sticker']}
-Также, если ты кидаешь дайс, есть вероятность, что выпадет, что-то хорошее, тогда тебе накрошит батон
+- Если бот ответит тебе на картинку, тебе на счёт капнет - {e.readble_amount(e.get_reward('photo', user_level))}
+- Если бот ответит на видео, тебе придёт - {e.readble_amount(e.get_reward('video', user_level))}
+- Если бот ответит на кружок или аудио, на счету появится - {e.readble_amount(e.get_reward('voice', user_level))}
+- Если бот ответит на стикер, то ты получишь - {e.readble_amount(e.get_reward('sticker', user_level))}
+Также, если ты кидаешь дайс, есть вероятность, что выпадет что-то хорошее, тогда тебе накрошит батон
 
 Пока что это все возможности баланса.
         ''',
@@ -148,16 +180,24 @@ def balance_info(message):
 @bot.message_handler(commands=['dice'])
 def throw_dice(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
-    if not DB.pay_balance(user_id, balance_rules['pay']['dice']):
+    user_level = DB.get_level(user_id)[0]
+    if not DB.pay_balance(user_id, e.get_pay_price('dice', user_level)):
         bot.send_message(
             chat_id, 
-            text=f"Недостаточно средств для броска(\nСтоимость: {balance_rules['pay']['dice']}\nВведи \"Преколы\", чтобы узнать как их заработать", 
+            text=f"Недостаточно средств для броска(\nСтоимость для твоего уровня: {e.readble_amount(e.get_pay_price('dice', user_level))}\nВведи \"Преколы\", чтобы узнать как их заработать", 
             disable_notification=True
         )
         logger.log_info(f'{user_name} doesn\'t have enough balance to dice')
         return None
 
-    dices = { '🎯': 'darts', '🎲': 'dice', '🏀': 'basketball', '⚽': 'soccer', '🎳': 'bowl', '🎰': 'slots'}
+    dices = { 
+        '🎯': 'darts', 
+        '🎲': 'dice', 
+        '🏀': 'basketball', 
+        '⚽': 'soccer', 
+        '🎳': 'bowl', 
+        '🎰': 'slots'
+    }
     dice = random.choice(list(dices.keys()))
     value = bot.send_dice(
         chat_id, 
@@ -176,7 +216,7 @@ def throw_dice(message):
                     sticker='CAACAgIAAxkBAAEU8adipe5aytwbEZx44NxBptsOdsMuqQACUhQAAjmtyEujIyiczfmW-CQE',
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, balance_rules['add']['dice']['darts'])
+                _add_balance(user_id, chat_id, user_name, e.get_reward('darts', user_level))
                 logger.log_extrainfo('Throw 6 - great')
             elif value.value == 1:
                 bot.send_sticker(
@@ -195,7 +235,7 @@ def throw_dice(message):
                 logger.log_extrainfo('Making +1 by rolling the dice')
                 _gamePlus1_add(str(message.from_user.id), message.chat.id, message.from_user.first_name)
             if value.value in [5, 6]:
-                _add_balance(user_id, chat_id, user_name, balance_rules['add']['dice'][f'dice{value.value}'])
+                _add_balance(user_id, chat_id, user_name, e.get_reward(f'dice{value.value}', user_level))
 
         case '🏀':
             if value.value in [4, 5]:
@@ -204,7 +244,7 @@ def throw_dice(message):
                     sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ',
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, balance_rules['add']['dice']['basketball'])
+                _add_balance(user_id, chat_id, user_name, e.get_reward('basketball', user_level))
                 logger.log_extrainfo('Making dunk')
         case '⚽':
             if value.value in [3, 4, 5]:
@@ -218,7 +258,7 @@ def throw_dice(message):
                     sticker=random.choice(stickers),
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, balance_rules['add']['dice']['soccer'])
+                _add_balance(user_id, chat_id, user_name, e.get_reward('soccer', user_level))
                 logger.log_extrainfo('GOOOOOAL')
         case '🎳':
             if value.value == 6:
@@ -227,7 +267,7 @@ def throw_dice(message):
                     sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ',
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, balance_rules['add']['dice']['bowl']) 
+                _add_balance(user_id, chat_id, user_name, e.get_reward('bowl', user_level)) 
                 logger.log_extrainfo('Hit the strike') 
             if value.value == 1:
                 bot.send_sticker(
@@ -248,7 +288,7 @@ def throw_dice(message):
                     sticker='CAACAgIAAxkBAAEE6AZimgghrbnEEo03sTl0JCnoHL-0NgACdBkAAlXI4Uu6jVZRP85VwCQE',
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, balance_rules['add']['dice']['slots777'])
+                _add_balance(user_id, chat_id, user_name, e.get_reward('slots777', user_level))
                 logger.log_extrainfo('Winning jackpot WOW') 
             elif value.value in [43, 22, 1]:
                 bot.send_message(
@@ -261,7 +301,7 @@ def throw_dice(message):
                     sticker='CAACAgIAAxkBAAEE_SZipgIAATrAnoBK4mz1-r9iULfgYTMAAhQWAAKAF8lL3tI17cAg9wEkBA',
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, balance_rules['add']['dice']['slots'])
+                _add_balance(user_id, chat_id, user_name, e.get_reward('slots', user_level))
                 logger.log_extrainfo('Three in the row') 
             else:
                 if _random([0,5], [0]):
@@ -313,7 +353,8 @@ def photo_message(photo):
             disable_notification=True
         )
     if number in [4,8]:
-        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['photo'])   
+        user_level = DB.get_level(user_id)[0]
+        _add_balance(user_id, chat_id, user_name, e.get_reward('photo', user_level))   
 
 
 @bot.message_handler(content_types=['video'])
@@ -328,7 +369,8 @@ def video_message(video):
             sticker=sticker,
             disable_notification=True
         )
-        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['video'])   
+        user_level = DB.get_level(user_id)[0]
+        _add_balance(user_id, chat_id, user_name, e.get_reward('video', user_level))   
 
 
 @bot.message_handler(content_types=['video_note', 'voice'])
@@ -343,7 +385,8 @@ def send_video_note_reaction(quick_voice_message):
             sticker=sticker,
             disable_notification=True
         )
-        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['voice']) 
+        user_level = DB.get_level(user_id)[0]
+        _add_balance(user_id, chat_id, user_name, e.get_reward('voice', user_level)) 
 
 
 @bot.message_handler(content_types=['sticker'])
@@ -352,7 +395,8 @@ def sticker_answer(sticker):
     logger.log_info(f'sticker gain number for {user_name}')
     if _random([0,10], [7]):
         logger.log_extrainfo(f'reply to sticker for {user_name}')
-        _add_balance(user_id, chat_id, user_name, balance_rules['add']['answers']['sticker']) 
+        user_level = DB.get_level(user_id)[0]
+        _add_balance(user_id, chat_id, user_name, e.get_reward('sticker', user_level)) 
   
 
 
