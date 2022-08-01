@@ -19,6 +19,8 @@ chat_id = None
 
 def readble_amount_name(amount):
     sAmount = str(amount)
+    if len(sAmount) > 6 :
+        return 'преколов'
     match sAmount[-1]:
         case '1':
             message_ending = ''
