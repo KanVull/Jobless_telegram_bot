@@ -89,10 +89,12 @@ def _random(rang: List[int], target: List[int]) -> bool:
 @bot.message_handler(content_types=["new_chat_members"])
 def new_member(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
-    DB.add_user(user_id, user_name, 30)
+    welcome_bonus = 3
+    DB.add_user(user_id, user_name, welcome_bonus)
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, Добро пожаловать!\nПриветственный бонус 30 преколов. Введи преколы, чтобы посмотреть как из тратить и зарабатывать',
+        text=f'{user_name}, Добро пожаловать!\nПриветственный бонус {welcome_bonus} преколов. \
+Введи "преколы", чтобы посмотреть как их тратить и зарабатывать',
         disable_notification=True
     )
     bot.send_sticker(
@@ -121,10 +123,15 @@ def get_balance(message):
 def show_level(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     user_level__name = DB.get_level(user_id)
+    can_you_buy_a_new_level = DB.level_up_check(user_id)
+    if not can_you_buy_a_new_level:
+        support_message = 'У тебя максимальный уровень на данный момент'
+    else:
+        support_message = f'Следующий уровень стоит {e.readble_amount(e.level_cost(user_level__name[0] + 1))} преколов\
+Чтобы купить, введи "Купить уровень" или воспользуйся командой "level_buy"'    
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, у тебя {user_level__name[0]} уровень\nТы - {user_level__name[1]}!\n \
-Чтобы перейти на следующий, напиши "Купить уровень" или воспользуйся командой бота "level_buy"',
+        text=f'{user_name}, у тебя {user_level__name[0]} уровень\nТы - {user_level__name[1]}!\n{support_message}',
         disable_notification=True
     )
     logger.log_info(f"{user_name} show the level: {user_level__name[0]} - {user_level__name[1]}")
@@ -160,9 +167,14 @@ def buy_level(message):
             return None
         DB.level_up(user_id)
         user_level__name = DB.get_level(user_id)    
+        can_you_buy_a_new_level = DB.level_up_check(user_id)
+        if can_you_buy_a_new_level:
+            support_message = f'Следующий уровень будет стоить {e.readble_amount(e.level_cost(user_level__name[0] + 1))} преколов'
+        else:
+            support_message = f'Это максимальный на данный момент уровень'    
         bot.send_message(
             chat_id=chat_id, 
-            text=f'{user_name}, поздравляю, теперь у тебя {user_level__name[0]} уровень.\nТы - {user_level__name[1]}',
+            text=f'{user_name}, поздравляю, теперь у тебя {user_level__name[0]} уровень.\nТы - {user_level__name[1]}\n{support_message}',
             disable_notification=True
         )
         logger.log_info(f"{user_name} rise level to {user_level__name[0]}")
@@ -181,6 +193,7 @@ def balance_info(message):
 Введи команду "Уровень", чтобы посмотреть информацию о данной системе.
 Введи команду "Дайс", чтобы поиграть своей удачей!
 
+У тебя сейчас {user_level} уровень.
 Получить преколы можно следующими способами:
 
 - Если бот ответит тебе на картинку, тебе на счёт капнет - {e.readble_amount(e.get_reward('photo', user_level))}

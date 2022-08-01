@@ -67,7 +67,7 @@ class Economy:
             dotPart = dotPart[:len(dotPart) - 1]
         sAmount = sAmount[:pw[1]]    
         if dotPart != '':
-            sAmount = sAmount[:pw[1]] + '.' + dotPart
+            sAmount = sAmount[:pw[1]] + ',' + dotPart
         return sAmount + definition[pw[0]-1]      
 
 
