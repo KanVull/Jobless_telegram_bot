@@ -127,7 +127,7 @@ def show_level(message):
     if not can_you_buy_a_new_level:
         support_message = 'У тебя максимальный уровень на данный момент'
     else:
-        support_message = f'Следующий уровень стоит {e.readble_amount(e.level_cost(user_level__name[0] + 1))} преколов\
+        support_message = f'Следующий уровень стоит {e.readble_amount(e.level_cost(user_level__name[0] + 1))} преколов\n\
 Чтобы купить, введи "Купить уровень" или воспользуйся командой "level_buy"'    
     bot.send_message(
         chat_id=chat_id, 
@@ -144,7 +144,7 @@ def buy_level(message):
     if not can_you_buy_a_new_level:
         bot.send_message(
             chat_id=chat_id, 
-            text=f'{user_name}, у тебя максимальный на этот период уровень\nСкоро добавлю новых уровней',
+            text=f'{user_name}, у тебя максимальный на данный момент уровень\nСкоро добавлю новых уровней',
             disable_notification=True
         )
         bot.send_sticker(
