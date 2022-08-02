@@ -176,10 +176,10 @@ def show_level(message):
     else:
         level_cost = e.level_cost(user_level__name[0] + 1)
         support_message = f'Следующий уровень стоит {e.readble_amount(level_cost)} {_readble_amount_name(level_cost)}\n\
-Чтобы купить, введи "Купить уровень" или воспользуйся командой /level_buy'    
+Чтобы купить, введи "Купить уровень" или /level_buy'    
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, у тебя {user_level__name[0]} уровень\nТы - {user_level__name[1]}!\n{support_message}',
+        text=f'{user_name}, ты - {user_level__name[1]}!\nУ тебя {user_level__name[0]} уровень\n{support_message}',
         disable_notification=True
     )
     logger.log_info(f"{user_name} show the level: {user_level__name[0]} - {user_level__name[1]}")
@@ -193,8 +193,8 @@ def show_available_buff(message):
     if next_buff is None:
         mess += 'Ты купил последний на данный момент бафф'
     else:
-        mess += f'Следующий бафф даст тебе: x{next_buff[1]}\nСтоит это улучшение: {e.readble_amount(next_buff[0])}\n\
-Чтобы купить улучшение введи "Купить бафф" или команду /buff_buy'
+        mess += f'Следующий бафф даст тебе: x{next_buff[1]}\nСтоит: {e.readble_amount(next_buff[0])}\n\
+Чтобы купить введи "Купить бафф" или команду /buff_buy'
     bot.send_message(
         chat_id=chat_id, 
         text=mess,

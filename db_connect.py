@@ -69,7 +69,7 @@ class DB_work():
         Call procedure to add amount of balance to id
         or create balance row wiht given id
         '''
-        self._cur.execute(f"CALL add_balance ('{id}', {amount});")
+        self._cur.execute(f"call add_balance('{id}', {amount});")
         self._connection.commit()   
 
     def get_balance(self, id: str) -> int:
