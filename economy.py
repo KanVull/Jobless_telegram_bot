@@ -10,14 +10,14 @@ class Economy:
                 'dice': 3,
             },
             'add': {
-                'darts': 9,
+                'darts': 14,
                 'dice5': 5,
                 'dice6': 10,
-                'basketball': 5,
+                'basketball': 9,
                 'soccer': 5,
-                'bowl': 9,
-                'slots': 90,
-                'slots777': 600,
+                'bowl': 14,
+                'slots': 60,
+                'slots777': 300,
                 'photo': 3,
                 'video': 5,
                 'voice': 2,
@@ -34,11 +34,11 @@ class Economy:
         raw_cost = self._base_level_cost * math.pow(self._level_percent, level - 1)
         return math.ceil(raw_cost / 10) * 10
 
-    def get_pay_price(self, type: str, player_level: int, buff: int) -> int:
+    def get_pay_price(self, type: str, player_level: int, buff: float) -> int:
         raw_cost = self._balance_rules['pay'][type]
         return self._get_cost(raw_cost, player_level, buff)
 
-    def get_reward(self, type: str, player_level: int, buff: int) -> int:
+    def get_reward(self, type: str, player_level: int, buff: float) -> int:
         raw_cost = self._balance_rules['add'][type]
         return self._get_cost(raw_cost, player_level, buff)
 
@@ -78,5 +78,21 @@ if __name__ == '__main__':
     e = Economy()
     # for i in range(0,100,10): 
         # print(e.readble_amount(e.get_reward('slots', i))) 
-    print(e.readble_amount(e.get_reward('video', 6, 10)))    
+    # print(e.readble_amount(e.get_reward('video', 6, 10))) 
+    # for i in range(1,70):
+    #     level_cost = e.level_cost(i)
+    #     level_cost_diff = math.pow(e._level_percent, i - 1)
+    #     reward_cost_diff = math.pow(e._reward_percent, i - 1)
+    #     if i >= 3:
+    #         reward_cost_diff *= 1.1
+    #     if i >= 13:
+    #         reward_cost_diff *= 1.6
+    #     if i >= 28:
+    #         reward_cost_diff *= 1.7 
+    #     if i >= 43:
+    #         reward_cost_diff *= 1.8  
+    #     if i >= 59:
+    #         reward_cost_diff *= 2
+
+    #     print(f"{i} -> {level_cost} : {level_cost_diff:.02f}\t|\t{reward_cost_diff:.02f}\t|\t{1.0*level_cost_diff/reward_cost_diff:.02f}")  
 

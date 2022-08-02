@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 from urllib.parse import urlparse
 import psycopg2
 
@@ -97,7 +97,7 @@ class DB_work():
 
         return answer    
 
-    def get_level_buff(self, id: str) -> Optional[str]:
+    def get_level_buff(self, id: str) -> Tuple[int, str, float]:
         self._cur.execute(f"select * from get_level('{id}');")
         level_name = self._cur.fetchone()[0]
         self._cur.execute(f"select level from person where id = '{id}';")
