@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 from urllib.parse import urlparse
 import psycopg2
 
@@ -97,20 +97,40 @@ class DB_work():
 
         return answer    
 
-    def get_level(self, id: str) -> Optional[str]:
+    def get_level_buff(self, id: str) -> Optional[str]:
         self._cur.execute(f"select * from get_level('{id}');")
         level_name = self._cur.fetchone()[0]
         self._cur.execute(f"select level from person where id = '{id}';")
         level = self._cur.fetchone()[0]
-        return (level, level_name)   
+        self._cur.execute(f"select x from buff where id = '{id}';")
+        buff = self._cur.fetchone()[0]
+        return (level, level_name, buff)   
+
+    def get_buff_info(self, id: str) -> Tuple(int, Optional[List[int, int]]):
+        self._cur.execute(f"select persent, buff_id from buff where id = '{id}';")
+        buff, buff_id = self._cur.fetchone()[0:2]
+        self._cur.execute(f"select exists(select id from buff_info where id={buff_id+1})")
+        next_buff = self._cur.fetchone()[0]
+        if next_buff:
+            self._cur.execute(f"select cost, x from buff_info where id = {buff_id}")
+            next_buff = self._cur.fetchone()[0:2]
+        else:
+            next_buff = None
+        return buff, next_buff        
+
+    def buff_buy(self, id: str) -> str:
+        self._cur.execute(f"select * from add_buff('{id}')")
+        name_of_buff = self._cur.fetchone()[0]   
+        self._connection.commit()
+        return name_of_buff
 
     def level_up_check(self, id: str) -> bool:
-        level = self.get_level(id)[0]
+        level = self.get_level_buff(id)[0]
         self._cur.execute(f"select exists(select name from levels where level={level+1})")
         return self._cur.fetchone()[0]    
     
     def level_up(self, id: str) -> None:
-        level = self.get_level(id)[0]
+        level = self.get_level_buff(id)[0]
         self._cur.execute(f"update person set level = {level+1} where id = '{id}'")
         self._connection.commit()
 

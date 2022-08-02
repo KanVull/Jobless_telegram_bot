@@ -25,19 +25,22 @@ class Economy:
             }
         }
 
+    def _get_cost(self, raw_cost, player_level, buff):
+        raw_cost *= math.ceil(math.pow(self._reward_percent, player_level))
+        raw_cost *= buff
+        return math.ceil(raw_cost)
+
     def level_cost(self, level: int) -> int:
         raw_cost = self._base_level_cost * math.pow(self._level_percent, level - 1)
         return math.ceil(raw_cost / 10) * 10
 
-    def get_pay_price(self, type: str, player_level: int) -> int:
+    def get_pay_price(self, type: str, player_level: int, buff: int) -> int:
         raw_cost = self._balance_rules['pay'][type]
-        raw_cost *= math.pow(self._reward_percent, player_level)
-        return math.ceil(raw_cost)
+        return self._get_cost(raw_cost, player_level, buff)
 
-    def get_reward(self, type: str, player_level: int) -> int:
+    def get_reward(self, type: str, player_level: int, buff: int) -> int:
         raw_cost = self._balance_rules['add'][type]
-        raw_cost *= math.pow(self._reward_percent, player_level)
-        return math.ceil(raw_cost)
+        return self._get_cost(raw_cost, player_level, buff)
 
     def readble_amount(self, amount: int) -> str:
         definition = [
@@ -71,11 +74,9 @@ class Economy:
         return sAmount + definition[pw[0]-1]      
 
 
-
-
 if __name__ == '__main__':
     e = Economy()
     # for i in range(0,100,10): 
         # print(e.readble_amount(e.get_reward('slots', i))) 
-    print(e.readble_amount(4100000582734590278345092384752309458852730945873409587230698570697536908746907430968740956734056874906874096874590687458906874089674390674906743906749068479687456907460897469047690872340598237450923847502398457230945872304958723406987234664967439086724689723049687234058927345900))    
+    print(e.readble_amount(e.get_reward('video', 6, 10)))    
 
