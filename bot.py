@@ -94,9 +94,17 @@ def _add_balance(user_id: str, chat_id: str, user_name: str, amount: int) -> Non
     )
     logger.log_extrainfo(f"Added {e.readble_amount(amount)} to balance")
 
-def _random(rang: List[int], target: List[int]) -> bool:
-    ran = random.randint(rang[0], rang[1])
-    return ran in target
+def _random(perсent: List[int]) -> int:
+    ran = random.random() * 100
+    percent = [0] + percent
+    for i in range(1, len(percent)):
+        percent[i] += percent[i-1]
+    count = 0
+    for per in percent:
+        if ran < per:
+            return count
+        count += 1
+    return 0       
 
 
 ###################################################################
@@ -104,6 +112,7 @@ def _random(rang: List[int], target: List[int]) -> bool:
 ###################################################################
 
 @bot.message_handler(content_types=["new_chat_members"])
+@bot.message_handler(commands=['start'])
 def new_member(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     welcome_bonus = 30
@@ -179,7 +188,7 @@ def show_level(message):
 def show_available_buff(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     buff, next_buff = DB.get_buff_info(user_id)
-    mess = f'Твой бафф: x{buff}\nУвеличивает всё, кроме стоимости уровня, во столько раз.'
+    mess = f'Твой бафф: x{buff}\nУвеличивает всё, кроме стоимости уровня.\n'
     if next_buff is None:
         mess += 'Ты купил последний на данный момент бафф'
     else:
@@ -194,7 +203,7 @@ def show_available_buff(message):
 
 @bot.message_handler(regexp='^(преколы)$')
 @bot.message_handler(commands=['prekoli'])
-def preloki_info(message):
+def prekoli_info(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     user_level_buff = DB.get_level_buff(user_id)
     x = user_level_buff[2]
@@ -448,7 +457,7 @@ def throw_dice(message):
                 _add_balance(user_id, chat_id, user_name, e.get_reward('slots', user_level_buff[0], user_level_buff[2]))
                 logger.log_extrainfo('Three in the row') 
             else:
-                if _random([0,5], [0]):
+                if _random([20]):
                     bot.send_sticker(
                         chat_id, 
                         sticker='CAACAgIAAxkBAAEE6BpimgihzCGdTjyxel5uFJDZfqwI9AACjRMAArwbyUvBk3xJQsTnBSQE',
@@ -465,25 +474,28 @@ def throw_dice(message):
 @bot.message_handler(content_types=['photo'])
 def photo_message(photo):
     chat_id, user_id, user_name = _get_chat_user_info(photo)
-    number = random.randint(0,10)
-    logger.log_info(f'photo gain {number} for {user_name}')
-    if number == 4:
-        logger.log_extrainfo(f'reply to photo for {user_name} in text mode')
-        message = DB.random_text_answer()
-        bot.send_message(
-            chat_id=chat_id, 
-            text=f'{user_name}, {message}',
-            disable_notification=True
-        )
-    elif number == 8:
-        logger.log_extrainfo(f'reply to photo for {user_name} in sticker mode')
-        sticker = DB.random_sticker_answer()
-        bot.send_sticker(
-            chat_id=chat_id, 
-            sticker=sticker,
-            disable_notification=True
-        )
-    if number in [4,8]:
+    state = _random([10,10])
+    logger.log_info(f'photo gain state: {state} for {user_name}')
+    match state:
+        case 1:
+            logger.log_extrainfo(f'reply to photo for {user_name} in text mode')
+            message = DB.random_text_answer()
+            bot.send_message(
+                chat_id=chat_id, 
+                text=f'{user_name}, {message}',
+                disable_notification=True
+            )
+        case 2:
+            logger.log_extrainfo(f'reply to photo for {user_name} in sticker mode')
+            sticker = DB.random_sticker_answer()
+            bot.send_sticker(
+                chat_id=chat_id, 
+                sticker=sticker,
+                disable_notification=True
+            )
+        case _:
+            pass    
+    if state != 0:
         user_level_buff = DB.get_level_buff(user_id)
         _add_balance(user_id, chat_id, user_name, e.get_reward('photo', user_level_buff[0], user_level_buff[2]))   
 
@@ -491,7 +503,7 @@ def photo_message(photo):
 def video_message(video):
     chat_id, user_id, user_name = _get_chat_user_info(video)
     logger.log_info(f'video gain number for {user_name}')
-    if _random([0,9], [0,3,6]):
+    if _random([35]):
         logger.log_extrainfo(f'reply to video for {user_name} in sticker mode')
         sticker = DB.random_sticker_answer()
         bot.send_sticker(
@@ -506,7 +518,7 @@ def video_message(video):
 def send_video_note_reaction(quick_voice_message):
     chat_id, user_id, user_name = _get_chat_user_info(quick_voice_message)
     logger.log_info(f'quick_voice_message gain number for {user_name}')
-    if _random([0,10], [0,3,5,7]):
+    if _random([40]):
         logger.log_extrainfo(f'reply to quick_voice_message for {user_name} in text mode')
         sticker = DB.random_sticker_answer()
         bot.send_sticker(
@@ -521,7 +533,7 @@ def send_video_note_reaction(quick_voice_message):
 def sticker_answer(sticker):
     chat_id, user_id, user_name = _get_chat_user_info(sticker)
     logger.log_info(f'sticker gain number for {user_name}')
-    if _random([0,10], [7]):
+    if _random([15]):
         logger.log_extrainfo(f'reply to sticker for {user_name}')
         user_level_buff = DB.get_level_buff(user_id)
         _add_balance(user_id, chat_id, user_name, e.get_reward('sticker', user_level_buff[0], user_level_buff[2])) 

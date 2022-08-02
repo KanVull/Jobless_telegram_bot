@@ -112,7 +112,7 @@ class DB_work():
         self._cur.execute(f"select exists(select id from buff_info where id={buff_id+1})")
         next_buff = self._cur.fetchone()[0]
         if next_buff:
-            self._cur.execute(f"select cost, x from buff_info where id = {buff_id}")
+            self._cur.execute(f"select cost, x from buff_info where id = {buff_id+1}")
             next_buff = self._cur.fetchone()[0:2]
         else:
             next_buff = None
