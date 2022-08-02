@@ -521,7 +521,7 @@ def send_video_note_reaction(quick_voice_message):
     chat_id, user_id, user_name = _get_chat_user_info(quick_voice_message)
     logger.log_info(f'quick_voice_message gain number for {user_name}')
     if _random([40]):
-        logger.log_extrainfo(f'reply to quick_voice_message for {user_name} in text mode')
+        logger.log_extrainfo(f'reply to quick_voice_message for {user_name}')
         sticker = DB.random_sticker_answer()
         bot.send_sticker(
             chat_id=chat_id, 
