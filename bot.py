@@ -316,9 +316,8 @@ def buy_buff(message):
         name_of_buff = DB.buff_buy(user_id)
         buff, next_buff = DB.get_buff_info(user_id)
         if next_buff is not None:
-            level_cost = e.level_cost(next_buff[0])
-            support_message = f'Следующий бафф будет стоить {e.readble_amount(level_cost)}\
- {_readble_amount_name(level_cost)} и добавит тебе x{e.readble_amount(next_buff[1])} к текущему улучшению.'
+            support_message = f'Следующий бафф будет стоить {e.readble_amount(next_buff[0])}\
+ {_readble_amount_name(next_buff[0])} и добавит тебе x{e.readble_amount(next_buff[1])} к текущему улучшению.'
         else:
             support_message = f'Ты купил максимальный на данный момент бафф'    
         bot.send_message(

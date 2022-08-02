@@ -42,7 +42,7 @@ class Economy:
         raw_cost = self._balance_rules['add'][type]
         return self._get_cost(raw_cost, player_level, buff)
 
-    def readble_amount(self, amount: int) -> str:
+    def readble_amount(self, amount: float) -> str:
         definition = [
             'k', 'M', 'B', 'T', 'q', 'Q', 's', 'S', 'O', 'N', 
             'D', 'UD', 'DD', 'TD', 'qD', 'QD', 'sD', 'SD', 'OD', 'ND', 
@@ -57,8 +57,24 @@ class Economy:
             'C', 'UC', 'DC', 'TC', 'qC', 'QC', 'sC', 'SC', 'OC', 'NC', 
         ]    
         sAmount = str(amount)
+        if '.' in sAmount:
+            afterdot = sAmount.split('.')[-1]
+            if len(afterdot) >= 2:
+                sAmount = sAmount[:sAmount.index('.') + 3]
+            else:    
+                while len(afterdot) < 2:
+                    afterdot += '0'
+                    sAmount += '0'    
+        else:
+            sAmount += '.00'
+
         l = len(sAmount)
-        if l <= 3:
+        if l <= 6:
+            if '.' in sAmount:
+                while sAmount.endswith('0'):
+                    sAmount = sAmount[:-1]
+            if sAmount.endswith('.'):
+                sAmount = sAmount[:-1]        
             return sAmount
         pw = list(divmod(l, 3))
         if pw[1] == 0:
@@ -67,11 +83,13 @@ class Economy:
         sAmount = sAmount[:pw[1] + 3]
         dotPart = sAmount[pw[1]:]
         while dotPart.endswith('0'):
-            dotPart = dotPart[:len(dotPart) - 1]
+            dotPart = dotPart[:len(dotPart) - 1]    
         sAmount = sAmount[:pw[1]]    
         if dotPart != '':
             sAmount = sAmount[:pw[1]] + ',' + dotPart
-        return sAmount + definition[pw[0]-1]      
+        if sAmount.endswith('.'):
+            sAmount = sAmount[:-1]    
+        return sAmount + definition[pw[0]-2]      
 
 
 if __name__ == '__main__':
@@ -95,4 +113,4 @@ if __name__ == '__main__':
     #         reward_cost_diff *= 2
 
     #     print(f"{i} -> {level_cost} : {level_cost_diff:.02f}\t|\t{reward_cost_diff:.02f}\t|\t{1.0*level_cost_diff/reward_cost_diff:.02f}")  
-
+    print(e.readble_amount(1.43453453))
