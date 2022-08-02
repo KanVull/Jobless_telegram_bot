@@ -475,7 +475,7 @@ def throw_dice(message):
 @bot.message_handler(content_types=['photo'])
 def photo_message(photo):
     chat_id, user_id, user_name = _get_chat_user_info(photo)
-    state = _random([10,10])
+    state = _random([15,20])
     logger.log_info(f'photo gain state: {state} for {user_name}')
     match state:
         case 1:
@@ -504,7 +504,7 @@ def photo_message(photo):
 def video_message(video):
     chat_id, user_id, user_name = _get_chat_user_info(video)
     logger.log_info(f'video gain number for {user_name}')
-    if _random([35]):
+    if _random([40]):
         logger.log_extrainfo(f'reply to video for {user_name} in sticker mode')
         sticker = DB.random_sticker_answer()
         bot.send_sticker(
@@ -534,7 +534,7 @@ def send_video_note_reaction(quick_voice_message):
 def sticker_answer(sticker):
     chat_id, user_id, user_name = _get_chat_user_info(sticker)
     logger.log_info(f'sticker gain number for {user_name}')
-    if _random([15]):
+    if _random([25]):
         logger.log_extrainfo(f'reply to sticker for {user_name}')
         user_level_buff = DB.get_level_buff(user_id)
         _add_balance(user_id, chat_id, user_name, e.get_reward('sticker', user_level_buff[0], user_level_buff[2])) 
