@@ -89,7 +89,7 @@ def _add_balance(user_id: str, chat_id: str, user_name: str, amount: int) -> Non
     DB.add_balance(user_id, amount)        
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, тебе на счёт капнуло {e.readble_amount(amount)} {_readble_amount_name(amount)}!',
+        text=f'{user_name}, кошелёк увеличен на {e.readble_amount(amount)} {_readble_amount_name(amount)}!',
         disable_notification=True
     )
     logger.log_extrainfo(f"Added {e.readble_amount(amount)} to balance")
@@ -174,7 +174,8 @@ def show_level(message):
     if not can_you_buy_a_new_level:
         support_message = 'У тебя максимальный уровень на данный момент'
     else:
-        support_message = f'Следующий уровень стоит {e.readble_amount(e.level_cost(user_level__name[0] + 1))} преколов\n\
+        level_cost = e.level_cost(user_level__name[0] + 1)
+        support_message = f'Следующий уровень стоит {e.readble_amount(level_cost)} {_readble_amount_name(level_cost)}\n\
 Чтобы купить, введи "Купить уровень" или воспользуйся командой "/level_buy"'    
     bot.send_message(
         chat_id=chat_id, 
@@ -214,23 +215,22 @@ def prekoli_info(message):
     bot.send_message(
         chat_id=chat_id,
         text = f'''Преколы это внутриботовая валюта.
+Свой баланс можно посмотреть командой "Баланс" или "/balance".
 Её можно тратить на покупку уровня и азартную игру Дайс, где ты можешь выиграть преколов (или проиграть).
-Введи команду "Уровень", чтобы посмотреть информацию о данной системе.
-Введи команду "Дайс", чтобы поиграть своей удачей!
-Введи команду "Бафф", чтобы посмотреть улучшение, которое ты можешь купить.
+Введи команду "Уровень" или "/level", чтобы посмотреть информацию о данной системе.
+Введи команду "Дайс" или "/dice", чтобы поиграть своей удачей!
+Введи команду "Бафф" или "/buff", чтобы посмотреть улучшение, которое ты можешь купить.
 
 У тебя сейчас {user_level_buff[0]} уровень.
 {buff_info}
 Получить преколы можно следующими способами:
 
-- Картинка: {e.readble_amount(e.get_reward('photo', user_level_buff[0], x))}
-- Видео: {e.readble_amount(e.get_reward('video', user_level_buff[0], x))}
-- Голосовое или кружок: {e.readble_amount(e.get_reward('voice', user_level_buff[0], x))}
-- Стикер: {e.readble_amount(e.get_reward('sticker', user_level_buff[0], x))}
+- Картинка\t\t| {e.readble_amount(e.get_reward('photo', user_level_buff[0], x))}
+- Видео\t\t| {e.readble_amount(e.get_reward('video', user_level_buff[0], x))}
+- Голосовое или кружок\t| {e.readble_amount(e.get_reward('voice', user_level_buff[0], x))}
+- Стикер\t\t| {e.readble_amount(e.get_reward('sticker', user_level_buff[0], x))}
 
-Дайс стоит: {e.readble_amount(e.get_pay_price('dice', user_level_buff[0], x))}
-
-Пока что это все возможности баланса.''',
+Дайс стоит: {e.readble_amount(e.get_pay_price('dice', user_level_buff[0], x))}''',
         disable_notification=True
     )
     logger.log_info(f'{user_name} enters Преколы')
@@ -273,7 +273,8 @@ def buy_level(message):
         user_level__name = DB.get_level_buff(user_id)    
         can_you_buy_a_new_level = DB.level_up_check(user_id)
         if can_you_buy_a_new_level:
-            support_message = f'Следующий уровень будет стоить {e.readble_amount(e.level_cost(user_level__name[0] + 1))} преколов'
+            level_cost = e.level_cost(user_level__name[0] + 1)
+            support_message = f'Следующий уровень будет стоить {e.readble_amount(level_cost)} {_readble_amount_name(level_cost)}'
         else:
             support_message = f'Это максимальный на данный момент уровень'    
         bot.send_message(
@@ -315,8 +316,9 @@ def buy_buff(message):
         name_of_buff = DB.buff_buy(user_id)
         buff, next_buff = DB.get_buff_info(user_id)
         if next_buff is not None:
-            support_message = f'Следующий бафф будет стоить {e.readble_amount(e.level_cost(next_buff[0]))}\
- преколов и добавит тебе x{e.readble_amount(next_buff[1])} к текущему улучшению.'
+            level_cost = e.level_cost(next_buff[0])
+            support_message = f'Следующий бафф будет стоить {e.readble_amount(level_cost)}\
+ {_readble_amount_name(level_cost)} и добавит тебе x{e.readble_amount(next_buff[1])} к текущему улучшению.'
         else:
             support_message = f'Ты купил максимальный на данный момент бафф'    
         bot.send_message(
@@ -337,7 +339,8 @@ def throw_dice(message):
     if not DB.pay_balance(user_id, pay_price):
         bot.send_message(
             chat_id, 
-            text=f"Недостаточно средств для броска(\nСтоимость для твоего уровня: {e.readble_amount(pay_price)}\nВведи \"Преколы\", чтобы узнать как их заработать", 
+            text=f'Недостаточно средств для броска(\nСтоимость для твоего уровня: \
+{e.readble_amount(pay_price)}\nВведи "Преколы" или "/prekoli", чтобы узнать как их заработать', 
             disable_notification=True
         )
         logger.log_info(f'{user_name} doesn\'t have enough balance to dice')
