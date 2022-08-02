@@ -94,7 +94,7 @@ def _add_balance(user_id: str, chat_id: str, user_name: str, amount: int) -> Non
     )
     logger.log_extrainfo(f"Added {e.readble_amount(amount)} to balance")
 
-def _random(perсent: List[int]) -> int:
+def _random(percent: List[int]) -> int:
     ran = random.random() * 100
     percent = [0] + percent
     for i in range(1, len(percent)):
