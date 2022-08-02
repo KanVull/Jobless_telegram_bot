@@ -106,7 +106,7 @@ class DB_work():
         buff = self._cur.fetchone()[0]
         return (level, level_name, buff)   
 
-    def get_buff_info(self, id: str) -> Tuple(int, Optional[List[int, int]]):
+    def get_buff_info(self, id: str) -> Tuple[int, Optional[List[int, int]]]:
         self._cur.execute(f"select persent, buff_id from buff where id = '{id}';")
         buff, buff_id = self._cur.fetchone()[0:2]
         self._cur.execute(f"select exists(select id from buff_info where id={buff_id+1})")
