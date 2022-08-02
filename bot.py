@@ -120,7 +120,7 @@ def new_member(message):
     bot.send_message(
         chat_id=chat_id, 
         text=f'{user_name}, Добро пожаловать!\nПриветственный бонус {welcome_bonus} преколов. \
-Введи "Преколы" или команду "/prekoli", чтобы посмотреть как их тратить и зарабатывать',
+Введи "Преколы" или команду /prekoli, чтобы посмотреть как их тратить и зарабатывать',
         disable_notification=True
     )
     bot.send_sticker(
@@ -176,7 +176,7 @@ def show_level(message):
     else:
         level_cost = e.level_cost(user_level__name[0] + 1)
         support_message = f'Следующий уровень стоит {e.readble_amount(level_cost)} {_readble_amount_name(level_cost)}\n\
-Чтобы купить, введи "Купить уровень" или воспользуйся командой "/level_buy"'    
+Чтобы купить, введи "Купить уровень" или воспользуйся командой /level_buy'    
     bot.send_message(
         chat_id=chat_id, 
         text=f'{user_name}, у тебя {user_level__name[0]} уровень\nТы - {user_level__name[1]}!\n{support_message}',
@@ -194,7 +194,7 @@ def show_available_buff(message):
         mess += 'Ты купил последний на данный момент бафф'
     else:
         mess += f'Следующий бафф даст тебе: x{next_buff[1]}\nСтоит это улучшение: {e.readble_amount(next_buff[0])}\n\
-Чтобы купить улучшение введи "Купить бафф" или команду "/buff_buy"'
+Чтобы купить улучшение введи "Купить бафф" или команду /buff_buy'
     bot.send_message(
         chat_id=chat_id, 
         text=mess,
@@ -215,20 +215,20 @@ def prekoli_info(message):
     bot.send_message(
         chat_id=chat_id,
         text = f'''Преколы это внутриботовая валюта.
-Свой баланс можно посмотреть командой "Баланс" или "/balance".
+Свой баланс можно посмотреть командой "Баланс" или /balance.
 Её можно тратить на покупку уровня и азартную игру Дайс, где ты можешь выиграть преколов (или проиграть).
-Введи команду "Уровень" или "/level", чтобы посмотреть информацию о данной системе.
-Введи команду "Дайс" или "/dice", чтобы поиграть своей удачей!
-Введи команду "Бафф" или "/buff", чтобы посмотреть улучшение, которое ты можешь купить.
+Введи команду "Уровень" или /level, чтобы посмотреть информацию о данной системе.
+Введи команду "Дайс" или /dice, чтобы поиграть своей удачей!
+Введи команду "Бафф" или /buff, чтобы посмотреть улучшение, которое ты можешь купить.
 
 У тебя сейчас {user_level_buff[0]} уровень.
 {buff_info}
 Получить преколы можно следующими способами:
 
-- Картинка\t\t| {e.readble_amount(e.get_reward('photo', user_level_buff[0], x))}
-- Видео\t\t| {e.readble_amount(e.get_reward('video', user_level_buff[0], x))}
-- Голосовое или кружок\t| {e.readble_amount(e.get_reward('voice', user_level_buff[0], x))}
-- Стикер\t\t| {e.readble_amount(e.get_reward('sticker', user_level_buff[0], x))}
+- Картинка: {e.readble_amount(e.get_reward('photo', user_level_buff[0], x))}
+- Видео: {e.readble_amount(e.get_reward('video', user_level_buff[0], x))}
+- Голосовое или кружок: {e.readble_amount(e.get_reward('voice', user_level_buff[0], x))}
+- Стикер: {e.readble_amount(e.get_reward('sticker', user_level_buff[0], x))}
 
 Дайс стоит: {e.readble_amount(e.get_pay_price('dice', user_level_buff[0], x))}''',
         disable_notification=True
@@ -339,8 +339,7 @@ def throw_dice(message):
     if not DB.pay_balance(user_id, pay_price):
         bot.send_message(
             chat_id, 
-            text=f'Недостаточно средств для броска(\nСтоимость для твоего уровня: \
-{e.readble_amount(pay_price)}\nВведи "Преколы" или "/prekoli", чтобы узнать как их заработать', 
+            text=f'Недостаточно средств для броска(\nСтоимость для твоего уровня: {e.readble_amount(pay_price)}', 
             disable_notification=True
         )
         logger.log_info(f'{user_name} doesn\'t have enough balance to dice')
