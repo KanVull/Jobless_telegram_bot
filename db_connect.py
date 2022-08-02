@@ -107,7 +107,7 @@ class DB_work():
         return (level, level_name, buff)   
 
     def get_buff_info(self, id: str) -> Any:
-        self._cur.execute(f"select persent, buff_id from buff where id = '{id}';")
+        self._cur.execute(f"select x, buff_id from buff where id = '{id}';")
         buff, buff_id = self._cur.fetchone()[0:2]
         self._cur.execute(f"select exists(select id from buff_info where id={buff_id+1})")
         next_buff = self._cur.fetchone()[0]
