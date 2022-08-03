@@ -81,7 +81,7 @@ class DB_work():
         answer = self._cur.fetchone()[0]    
         self._connection.commit() 
 
-        return answer
+        return float(answer)
 
     def pay_balance(self, id: str, amount: float) -> bool:
         '''
