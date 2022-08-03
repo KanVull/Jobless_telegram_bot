@@ -78,7 +78,7 @@ class DB_work():
         or create new row with id and 0 val balance
         '''
         self._cur.execute(f"select * from get_balance('{id}');")
-        answer = int(self._cur.fetchone()[0])      
+        answer = self._cur.fetchone()[0]    
         self._connection.commit() 
 
         return answer
