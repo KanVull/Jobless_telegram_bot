@@ -34,11 +34,11 @@ class Economy:
 
     def get_pay_price(self, type: str, player_level: int, buff: float) -> int:
         raw_cost = self._balance_rules['pay'][type]
-        return self._get_cost(raw_cost, player_level, buff)
+        return self._get_cost(float(raw_cost), player_level, buff)
 
     def get_reward(self, type: str, player_level: int, buff: float) -> int:
         raw_cost = self._balance_rules['add'][type]
-        return self._get_cost(raw_cost, player_level, buff)
+        return self._get_cost(float(raw_cost), player_level, buff)
 
     def readble_amount(self, amount: float) -> str:
         definition = [
@@ -54,7 +54,7 @@ class Economy:
             'Ng', 'UNg', 'DNg', 'TNg', 'qNg', 'QNg', 'sNg', 'SNg', 'ONg', 'NNg',
             'C', 'UC', 'DC', 'TC', 'qC', 'QC', 'sC', 'SC', 'OC', 'NC', 
         ]    
-        sAmount = str(amount)
+        sAmount = str(float(amount))
         if '.' in sAmount:
             afterdot = sAmount.split('.')[-1]
             if len(afterdot) >= 2:
