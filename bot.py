@@ -85,14 +85,15 @@ def _gamePlus1_add(user_id: str, chat_id: str, user_name: str) -> None:
         if sticker_state is not None:
             bot.send_sticker(chat_id=chat_id, sticker=sticker_state)
 
-def _add_balance(user_id: str, chat_id: str, user_name: str, amount: int) -> None:
-    DB.add_balance(user_id, amount)        
+def _add_balance(user_id: str, chat_id: str, user_name: str, amount: float) -> None:
+    DB.add_balance(user_id, amount)   
+    r_a = e.readble_amount(amount)
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, кошелёк увеличен на {e.readble_amount(amount)} {_readble_amount_name(amount)}!',
+        text=f'{user_name}, кошелёк увеличен на {r_a} {_readble_amount_name(amount)}!',
         disable_notification=True
     )
-    logger.log_extrainfo(f"Added {e.readble_amount(amount)} to balance")
+    logger.log_extrainfo(f"Added {e.readble_amount(r_a)} to balance")
 
 def _random(percent: List[int]) -> int:
     ran = random.random() * 100
@@ -115,11 +116,11 @@ def _random(percent: List[int]) -> int:
 @bot.message_handler(commands=['start'])
 def new_member(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
-    welcome_bonus = 30
+    welcome_bonus = 30.0
     DB.add_user(user_id, user_name, welcome_bonus)
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, Добро пожаловать!\nПриветственный бонус {welcome_bonus} преколов. \
+        text=f'{user_name}, Добро пожаловать!\nПриветственный бонус {e.readble_amount(welcome_bonus)} преколов. \
 Введи "Преколы" или команду /prekoli, чтобы посмотреть как их тратить и зарабатывать',
         disable_notification=True
     )
@@ -138,7 +139,7 @@ def gamePlus1_byCommand(message):
 
 @bot.message_handler(regexp=r'^[0-9]')
 def echo(message):
-    chat_id, user_id, user_name = _get_chat_user_info(message)
+    chat_id, _, user_name = _get_chat_user_info(message)
     logger.log_info(f'reply for number for {user_name}')
     bot.send_message(
         chat_id, 
@@ -333,8 +334,8 @@ def buy_buff(message):
 @bot.message_handler(commands=['dice'])
 def throw_dice(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
-    user_level_buff = DB.get_level_buff(user_id)
-    pay_price = e.get_pay_price('dice', user_level_buff[0], user_level_buff[2])
+    level, _, buff = DB.get_level_buff(user_id)
+    pay_price = e.get_pay_price('dice', level, buff)
     if not DB.pay_balance(user_id, pay_price):
         bot.send_message(
             chat_id, 
@@ -370,7 +371,7 @@ def throw_dice(message):
                     sticker='CAACAgIAAxkBAAEU8adipe5aytwbEZx44NxBptsOdsMuqQACUhQAAjmtyEujIyiczfmW-CQE',
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, e.get_reward('darts', user_level_buff[0], user_level_buff[2]))
+                _add_balance(user_id, chat_id, user_name, e.get_reward('darts', level, buff))
                 logger.log_extrainfo('Throw 6 - great')
             elif value.value == 1:
                 bot.send_sticker(
@@ -389,7 +390,7 @@ def throw_dice(message):
                 logger.log_extrainfo('Making +1 by rolling the dice')
                 _gamePlus1_add(str(message.from_user.id), message.chat.id, message.from_user.first_name)
             if value.value in [5, 6]:
-                _add_balance(user_id, chat_id, user_name, e.get_reward(f'dice{value.value}', user_level_buff[0], user_level_buff[2]))
+                _add_balance(user_id, chat_id, user_name, e.get_reward(f'dice{value.value}', level, buff))
 
         case '🏀':
             if value.value in [4, 5]:
@@ -398,7 +399,7 @@ def throw_dice(message):
                     sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ',
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, e.get_reward('basketball', user_level_buff[0], user_level_buff[2]))
+                _add_balance(user_id, chat_id, user_name, e.get_reward('basketball', level, buff))
                 logger.log_extrainfo('Making dunk')
         case '⚽':
             if value.value in [3, 4, 5]:
@@ -412,7 +413,7 @@ def throw_dice(message):
                     sticker=random.choice(stickers),
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, e.get_reward('soccer', user_level_buff[0], user_level_buff[2]))
+                _add_balance(user_id, chat_id, user_name, e.get_reward('soccer', level, buff))
                 logger.log_extrainfo('GOOOOOAL')
         case '🎳':
             if value.value == 6:
@@ -421,7 +422,7 @@ def throw_dice(message):
                     sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ',
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, e.get_reward('bowl', user_level_buff[0], user_level_buff[2])) 
+                _add_balance(user_id, chat_id, user_name, e.get_reward('bowl', level, buff)) 
                 logger.log_extrainfo('Hit the strike') 
             if value.value == 1:
                 bot.send_sticker(
@@ -442,7 +443,7 @@ def throw_dice(message):
                     sticker='CAACAgIAAxkBAAEE6AZimgghrbnEEo03sTl0JCnoHL-0NgACdBkAAlXI4Uu6jVZRP85VwCQE',
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, e.get_reward('slots777', user_level_buff[0], user_level_buff[2]))
+                _add_balance(user_id, chat_id, user_name, e.get_reward('slots777', level, buff))
                 logger.log_extrainfo('Winning jackpot WOW') 
             elif value.value in [43, 22, 1]:
                 bot.send_message(
@@ -455,7 +456,7 @@ def throw_dice(message):
                     sticker='CAACAgIAAxkBAAEE_SZipgIAATrAnoBK4mz1-r9iULfgYTMAAhQWAAKAF8lL3tI17cAg9wEkBA',
                     disable_notification=True
                 )
-                _add_balance(user_id, chat_id, user_name, e.get_reward('slots', user_level_buff[0], user_level_buff[2]))
+                _add_balance(user_id, chat_id, user_name, e.get_reward('slots', level, buff))
                 logger.log_extrainfo('Three in the row') 
             else:
                 if _random([20]):
@@ -497,8 +498,8 @@ def photo_message(photo):
         case _:
             pass    
     if state != 0:
-        user_level_buff = DB.get_level_buff(user_id)
-        _add_balance(user_id, chat_id, user_name, e.get_reward('photo', user_level_buff[0], user_level_buff[2]))   
+        level, _, buff = DB.get_level_buff(user_id)
+        _add_balance(user_id, chat_id, user_name, e.get_reward('photo', level, buff))   
 
 @bot.message_handler(content_types=['video'])
 def video_message(video):
@@ -512,8 +513,8 @@ def video_message(video):
             sticker=sticker,
             disable_notification=True
         )
-        user_level_buff = DB.get_level_buff(user_id)
-        _add_balance(user_id, chat_id, user_name, e.get_reward('video', user_level_buff[0], user_level_buff[2]))   
+        level, _, buff = DB.get_level_buff(user_id)
+        _add_balance(user_id, chat_id, user_name, e.get_reward('video', level, buff))   
 
 @bot.message_handler(content_types=['video_note', 'voice'])
 def send_video_note_reaction(quick_voice_message):
@@ -527,8 +528,8 @@ def send_video_note_reaction(quick_voice_message):
             sticker=sticker,
             disable_notification=True
         )
-        user_level_buff = DB.get_level_buff(user_id)
-        _add_balance(user_id, chat_id, user_name, e.get_reward('voice', user_level_buff[0], user_level_buff[2])) 
+        level, _, buff= DB.get_level_buff(user_id)
+        _add_balance(user_id, chat_id, user_name, e.get_reward('voice', level, buff)) 
 
 @bot.message_handler(content_types=['sticker'])
 def sticker_answer(sticker):
@@ -536,8 +537,8 @@ def sticker_answer(sticker):
     logger.log_info(f'sticker gain number for {user_name}')
     if _random([25]):
         logger.log_extrainfo(f'reply to sticker for {user_name}')
-        user_level_buff = DB.get_level_buff(user_id)
-        _add_balance(user_id, chat_id, user_name, e.get_reward('sticker', user_level_buff[0], user_level_buff[2])) 
+        level, _, buff = DB.get_level_buff(user_id)
+        _add_balance(user_id, chat_id, user_name, e.get_reward('sticker', level, buff)) 
 
 
 ###################################################################

@@ -7,32 +7,30 @@ class Economy:
         self._reward_percent = 1.25
         self._balance_rules = {
             'pay': {
-                'dice': 3,
+                'dice': 3.0,
             },
             'add': {
-                'darts': 14,
-                'dice5': 5,
-                'dice6': 10,
-                'basketball': 9,
-                'soccer': 5,
-                'bowl': 14,
-                'slots': 60,
-                'slots777': 300,
-                'photo': 3,
-                'video': 5,
-                'voice': 2,
-                'sticker': 1,
+                'darts': 14.0,
+                'dice5': 5.0,
+                'dice6': 10.0,
+                'basketball': 9.0,
+                'soccer': 5.0,
+                'bowl': 14.0,
+                'slots': 60.0,
+                'slots777': 300.0,
+                'photo': 3.0,
+                'video': 5.0,
+                'voice': 2.0,
+                'sticker': 1.0,
             }
         }
 
     def _get_cost(self, raw_cost, player_level, buff):
-        raw_cost *= math.ceil(math.pow(self._reward_percent, player_level))
-        raw_cost *= buff
-        return math.ceil(raw_cost)
+        return raw_cost * math.pow(self._reward_percent, player_level) * buff
 
-    def level_cost(self, level: int) -> int:
+    def level_cost(self, level: int) -> float:
         raw_cost = self._base_level_cost * math.pow(self._level_percent, level - 1)
-        return math.ceil(raw_cost / 10) * 10
+        return float(math.ceil(raw_cost / 10) * 10)
 
     def get_pay_price(self, type: str, player_level: int, buff: float) -> int:
         raw_cost = self._balance_rules['pay'][type]
@@ -113,4 +111,4 @@ if __name__ == '__main__':
     #         reward_cost_diff *= 2
 
     #     print(f"{i} -> {level_cost} : {level_cost_diff:.02f}\t|\t{reward_cost_diff:.02f}\t|\t{1.0*level_cost_diff/reward_cost_diff:.02f}")  
-    print(e.readble_amount(1.43453453))
+    print(e.readble_amount(12345678.123456789123456789123456789))

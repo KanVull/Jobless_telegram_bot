@@ -64,7 +64,7 @@ class DB_work():
 
         return data_plusone['player_inrow'], data_plusone['count']      
 
-    def add_balance(self, id: str, amount: int) -> None:
+    def add_balance(self, id: str, amount: float) -> None:
         '''
         Call procedure to add amount of balance to id
         or create balance row wiht given id
@@ -72,7 +72,7 @@ class DB_work():
         self._cur.execute(f"call add_balance('{id}', {amount});")
         self._connection.commit()   
 
-    def get_balance(self, id: str) -> int:
+    def get_balance(self, id: str) -> float:
         '''
         Check for existing id and get balance amount if found
         or create new row with id and 0 val balance
@@ -83,7 +83,7 @@ class DB_work():
 
         return answer
 
-    def pay_balance(self, id: str, amount: int) -> bool:
+    def pay_balance(self, id: str, amount: float) -> bool:
         '''
         returns 
         True if payment was success
@@ -134,6 +134,6 @@ class DB_work():
         self._cur.execute(f"update person set level = {level+1} where id = '{id}'")
         self._connection.commit()
 
-    def add_user(self, user_id: str, user_name: str, hello_bonus=0) -> None:
+    def add_user(self, user_id: str, user_name: str, hello_bonus=0.0) -> None:
         self._cur.execute(f"call add_user('{user_id}', '{user_name}', {hello_bonus})")
         self._connection.commit()
