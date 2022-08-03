@@ -26,7 +26,7 @@ class Economy:
         }
 
     def _get_cost(self, raw_cost, player_level, buff):
-        return raw_cost * math.pow(self._reward_percent, player_level) * buff
+        return raw_cost * math.pow(self._reward_percent, player_level) * float(buff)
 
     def level_cost(self, level: int) -> float:
         raw_cost = self._base_level_cost * math.pow(self._level_percent, level - 1)
@@ -38,7 +38,7 @@ class Economy:
 
     def get_reward(self, type: str, player_level: int, buff: float) -> int:
         raw_cost = self._balance_rules['add'][type]
-        return self._get_cost(float(raw_cost), player_level, buff)
+        return self._get_cost(raw_cost, player_level, buff)
 
     def readble_amount(self, amount: float) -> str:
         definition = [
@@ -54,7 +54,7 @@ class Economy:
             'Ng', 'UNg', 'DNg', 'TNg', 'qNg', 'QNg', 'sNg', 'SNg', 'ONg', 'NNg',
             'C', 'UC', 'DC', 'TC', 'qC', 'QC', 'sC', 'SC', 'OC', 'NC', 
         ]    
-        sAmount = str(float(amount))
+        sAmount = str(amount)
         if '.' in sAmount:
             afterdot = sAmount.split('.')[-1]
             if len(afterdot) >= 2:
