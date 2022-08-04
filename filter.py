@@ -24,7 +24,7 @@ class Filter():
         if self._users_timers[id][tp].full():
             first_date = self._users_timers[id][tp].queue[0]
             diff = (now_date - first_date).total_seconds() / 60.0
-            if diff <= self._rules[tp][1]:
+            if diff > self._rules[tp][1]:
                 self._users_timers[id][tp].get()
                 self._users_timers[id][tp].put(now_date)
                 return True
