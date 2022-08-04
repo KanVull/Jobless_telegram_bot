@@ -109,14 +109,17 @@ class DB_work():
     def get_buff_info(self, id: str) -> Any:
         self._cur.execute(f"select x, buff_id from buff where id = '{id}';")
         buff, buff_id = self._cur.fetchone()[0:2]
+        buff = float(buff)
         self._cur.execute(f"select exists(select id from buff_info where id={buff_id+1})")
         next_buff = self._cur.fetchone()[0]
         if next_buff:
             self._cur.execute(f"select cost, x from buff_info where id = {buff_id+1}")
-            next_buff = self._cur.fetchone()[0:2]
+            next_cost, next_buff = self._cur.fetchone()[0:2]
+            next_cost = float(next_cost)
+            next_buff = float(next_buff)
         else:
             next_buff = None
-        return buff, next_buff        
+        return buff, [next_cost, next_buff]        
 
     def buff_buy(self, id: str) -> str:
         self._cur.execute(f"select * from add_buff('{id}')")
