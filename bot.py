@@ -7,6 +7,7 @@ import time
 import logger
 import db_connect
 import economy
+import filter
 
 
 ###################################################################
@@ -19,6 +20,7 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 bot = telebot.TeleBot(TELEBOT_ACCESS_TOKEN, parse_mode=False)
 DB = db_connect.DB_work(DATABASE_URL)
 e = economy.Economy()
+F = filter.Filter()
 
 chat_id = None
 
@@ -476,6 +478,9 @@ def throw_dice(message):
 @bot.message_handler(content_types=['photo'])
 def photo_message(photo):
     chat_id, user_id, user_name = _get_chat_user_info(photo)
+    if not F.check_type(user_id, 'photo'):
+        logger.log_info(f'photo block timeout for {user_name}')
+        return None
     state = _random([15,20])
     logger.log_info(f'photo gain state: {state} for {user_name}')
     match state:
@@ -504,6 +509,9 @@ def photo_message(photo):
 @bot.message_handler(content_types=['video'])
 def video_message(video):
     chat_id, user_id, user_name = _get_chat_user_info(video)
+    if not F.check_type(user_id, 'video'):
+        logger.log_info(f'video block timeout for {user_name}')
+        return None
     logger.log_info(f'video gain number for {user_name}')
     if _random([40]):
         logger.log_extrainfo(f'reply to video for {user_name} in sticker mode')
@@ -519,6 +527,9 @@ def video_message(video):
 @bot.message_handler(content_types=['video_note', 'voice'])
 def send_video_note_reaction(quick_voice_message):
     chat_id, user_id, user_name = _get_chat_user_info(quick_voice_message)
+    if not F.check_type(user_id, 'quick_voice'):
+        logger.log_info(f'quick_voice_message block timeout for {user_name}')
+        return None
     logger.log_info(f'quick_voice_message gain number for {user_name}')
     if _random([40]):
         logger.log_extrainfo(f'reply to quick_voice_message for {user_name}')
@@ -534,6 +545,9 @@ def send_video_note_reaction(quick_voice_message):
 @bot.message_handler(content_types=['sticker'])
 def sticker_answer(sticker):
     chat_id, user_id, user_name = _get_chat_user_info(sticker)
+    if not F.check_type(user_id, 'sticker'):
+        logger.log_info(f'sticker block timeout for {user_name}')
+        return None
     logger.log_info(f'sticker gain number for {user_name}')
     if _random([25]):
         logger.log_extrainfo(f'reply to sticker for {user_name}')
