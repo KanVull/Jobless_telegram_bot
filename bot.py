@@ -535,12 +535,12 @@ def video_message(video):
         level, _, buff = DB.get_level_buff(user_id)
         _add_balance(user_id, chat_id, user_name, e.get_reward('video', level, buff))   
 
-@bot.message_handler(content_types=['video_note', 'voice'])
-def send_video_note_reaction(quick_voice_message):
+def send_video_note_voice_reaction(quick_voice_message, duration):
     chat_id, user_id, user_name = _get_chat_user_info(quick_voice_message)
-    if not F.check_type(user_id, 'quick_voice'):
-        logger.log_info(f'quick_voice_message block timeout for {user_name}')
-        return None
+    if duration < 8:
+        if not F.check_type(user_id, 'quick_voice'):
+            logger.log_info(f'quick_voice_message block timeout for {user_name}')
+            return None
     logger.log_info(f'quick_voice_message gain number for {user_name}')
     if _random([40]):
         logger.log_extrainfo(f'reply to quick_voice_message for {user_name}')
@@ -552,6 +552,14 @@ def send_video_note_reaction(quick_voice_message):
         )
         level, _, buff= DB.get_level_buff(user_id)
         _add_balance(user_id, chat_id, user_name, e.get_reward('voice', level, buff)) 
+
+@bot.message_handler(content_types=['video_note'])
+def video_note_answer(quick_voice_message):
+    send_video_note_voice_reaction(quick_voice_message, quick_voice_message.video_note.duration)
+
+@bot.message_handler(content_types=['voice'])
+def video_note_answer(quick_voice_message):
+    send_video_note_voice_reaction(quick_voice_message, quick_voice_message.voice.duration)    
 
 @bot.message_handler(content_types=['sticker'])
 def sticker_answer(sticker):
