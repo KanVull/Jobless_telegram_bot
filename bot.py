@@ -119,19 +119,30 @@ def _random(percent: List[int]) -> int:
 def new_member(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     welcome_bonus = 30.0
-    DB.add_user(user_id, user_name, welcome_bonus)
-    bot.send_message(
-        chat_id=chat_id, 
-        text=f'{user_name}, Добро пожаловать!\nПриветственный бонус {e.readble_amount(welcome_bonus)} преколов. \
+    if DB.add_user(user_id, user_name, welcome_bonus):
+        bot.send_message(
+            chat_id=chat_id, 
+            text=f'{user_name}, Добро пожаловать!\nПриветственный бонус {e.readble_amount(welcome_bonus)} {_readble_amount_name(welcome_bonus)}. \
 Введи "Преколы" или команду /prekoli, чтобы посмотреть как их тратить и зарабатывать',
-        disable_notification=True
-    )
-    bot.send_sticker(
-        chat_id, 
-        sticker='CAACAgIAAxkBAAEWkuti5qorkIqeTaeX0iC_TQQoI6DzqAACXRUAAmyuUEhG7eTQjfA7RykE',
-        disable_notification=True
-    )
-    logger.log_info(f"{user_name} our new user!")
+            disable_notification=True
+        )
+        bot.send_sticker(
+            chat_id, 
+            sticker='CAACAgIAAxkBAAEWkuti5qorkIqeTaeX0iC_TQQoI6DzqAACXRUAAmyuUEhG7eTQjfA7RykE',
+            disable_notification=True
+        )
+        logger.log_info(f"{user_name} our new user!")
+    else:
+        user_level_buff = DB.get_level_buff(user_id)
+        balance = DB.get_balance(user_id)
+        bot.send_message(
+            chat_id=chat_id, 
+            text=f'{user_name}, Добро пожаловать!\nТак как ты уже пользователь батона, то весь твой прогресс будет действовать и здесь\n\
+У тебя {e.readble_amount(balance)} {_readble_amount_name(balance)}. Уровень {user_level_buff[0]}.\nТы - {user_level_buff[1]}!\n\
+Твой бафф: x{e.readble_amount(user_level_buff[2])}',
+            disable_notification=True
+        )
+
 
 @bot.message_handler(regexp=r'^(\+1)$')
 @bot.message_handler(commands=['plus'])
