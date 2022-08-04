@@ -22,7 +22,7 @@ class Filter():
         self._append_user(id)
         now_date = datetime.datetime.now()
         if self._users_timers[id][tp].full():
-            first_date = self._users_timers[id][tp][0]
+            first_date = self._users_timers[id][tp].queue[0]
             diff = (now_date - first_date).total_seconds() / 60.0
             if diff <= self._rules[tp][1]:
                 self._users_timers[id][tp].get()
