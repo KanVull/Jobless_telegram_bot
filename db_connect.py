@@ -138,5 +138,6 @@ class DB_work():
         self._connection.commit()
 
     def add_user(self, user_id: str, user_name: str, hello_bonus=0.0) -> None:
-        self._cur.execute(f"call add_user('{user_id}', '{user_name}', {hello_bonus})")
+        answer = self._cur.execute(f"select * from add_user('{user_id}', '{user_name}', {hello_bonus})")
         self._connection.commit()
+        return answer
