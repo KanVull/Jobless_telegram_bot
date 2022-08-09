@@ -22,6 +22,10 @@ class DB_work():
         self._cur.execute("select id from sticker_answers order by random() limit 1;") 
         return self._cur.fetchone()[0]
 
+    def random_fart(self):
+        self._cur.execute("select data from sound where type = 'fart' order by random() limit 1;") 
+        return self._cur.fetchone()[0]     
+
     def _get_plusoneData(self):
         self._cur.execute("select * from gameplus1;")
         data_plusone = dict(self._cur.fetchall())

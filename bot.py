@@ -160,6 +160,16 @@ def echo(message):
         disable_notification=True
     )
 
+@bot.message_handler(regexp='перд')
+def fart_noice_voice_message(message):
+    chat_id, _, user_name = _get_chat_user_info(message)
+    fart = DB.random_fart()
+    logger.log_info(f'Farted for {user_name}')
+    bot.send_voice(
+        chat_id, 
+        voice=fart,
+        disable_notification=True
+    )
 
 ###################################################################
 ##                       User information                        ##
