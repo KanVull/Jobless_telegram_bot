@@ -90,12 +90,14 @@ def _gamePlus1_add(user_id: str, chat_id: str, user_name: str) -> None:
 def _add_balance(user_id: str, chat_id: str, user_name: str, amount: float) -> None:
     DB.add_balance(user_id, amount)   
     r_a = e.readble_amount(amount)
+    balance = DB.get_balance(user_id)
+    r_balance = e.readble_amount(balance)
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, кошелёк увеличен на {r_a} {_readble_amount_name(amount)}!',
+        text=f'{user_name}, кошелёк увеличен на {r_a} {_readble_amount_name(amount)}!\nBalance: {r_balance}',
         disable_notification=True
     )
-    logger.log_extrainfo(f"Added {e.readble_amount(r_a)} to balance")
+    logger.log_extrainfo(f"Added {e.readble_amount(r_a)} to balance: {e.readble_amount(balance - amount)} -> {r_balance}")
 
 def _random(percent: List[int]) -> int:
     ran = random.random() * 100
@@ -522,7 +524,7 @@ def photo_message(photo):
             )
         case _:
             pass    
-    if state != 0:
+    if state:
         level, _, buff = DB.get_level_buff(user_id)
         _add_balance(user_id, chat_id, user_name, e.get_reward('photo', level, buff))   
 
@@ -532,9 +534,9 @@ def video_message(video):
     if not F.check_type(user_id, 'video'):
         logger.log_info(f'video block timeout for {user_name}')
         return None
-    logger.log_info(f'video gain number for {user_name}')
-    if _random([40]):
-        logger.log_extrainfo(f'reply to video for {user_name} in sticker mode')
+    state = _random([40]) 
+    logger.log_info(f'video gain state {state} for {user_name}')
+    if state:
         sticker = DB.random_sticker_answer()
         bot.send_sticker(
             chat_id=chat_id, 
@@ -550,9 +552,9 @@ def send_video_note_voice_reaction(quick_voice_message, duration):
         if not F.check_type(user_id, 'quick_voice'):
             logger.log_info(f'quick_voice_message block timeout for {user_name}')
             return None
-    logger.log_info(f'quick_voice_message gain number for {user_name}')
-    if _random([40]):
-        logger.log_extrainfo(f'reply to quick_voice_message for {user_name}')
+    state = _random([40])
+    logger.log_info(f'quick_voice_message gain state {state} for {user_name}')
+    if state:
         sticker = DB.random_sticker_answer()
         bot.send_sticker(
             chat_id=chat_id, 
@@ -576,9 +578,9 @@ def sticker_answer(sticker):
     if not F.check_type(user_id, 'sticker'):
         logger.log_info(f'sticker block timeout for {user_name}')
         return None
-    logger.log_info(f'sticker gain number for {user_name}')
-    if _random([25]):
-        logger.log_extrainfo(f'reply to sticker for {user_name}')
+    state = _random([25])
+    logger.log_info(f'sticker gain state {state} for {user_name}')
+    if state:
         level, _, buff = DB.get_level_buff(user_id)
         _add_balance(user_id, chat_id, user_name, e.get_reward('sticker', level, buff)) 
 
