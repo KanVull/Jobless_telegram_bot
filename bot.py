@@ -143,7 +143,6 @@ def new_member(message):
             disable_notification=True
         )
 
-
 @bot.message_handler(regexp=r'^(\+1)$')
 @bot.message_handler(commands=['plus'])
 def gamePlus1_byCommand(message):
@@ -160,7 +159,7 @@ def echo(message):
         disable_notification=True
     )
 
-@bot.message_handler(regexp='перд')
+@bot.message_handler(regexp='(перд|пук|сру|сри|сра|срё|fart|дрист)')
 def fart_noice_voice_message(message):
     chat_id, _, user_name = _get_chat_user_info(message)
     fart = DB.random_fart()
