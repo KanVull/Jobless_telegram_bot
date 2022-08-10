@@ -94,7 +94,7 @@ def _add_balance(user_id: str, chat_id: str, user_name: str, amount: float) -> N
     r_balance = e.readble_amount(balance)
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, кошелёк увеличен на {r_a} {_readble_amount_name(amount)}!\nBalance: {r_balance}',
+        text=f'{user_name}, кошелёк увеличен на {r_a} {_readble_amount_name(amount)}!\nВ кошельке: {r_balance}',
         disable_notification=True
     )
     logger.log_extrainfo(f"Added {e.readble_amount(r_a)} to balance: {e.readble_amount(balance - amount)} -> {r_balance}")
