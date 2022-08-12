@@ -106,7 +106,7 @@ def _add_balance(user_id: str, chat_id: str, user_name: str, amount: float) -> N
     r_balance = e.readble_amount(balance)
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, + кошелёк: {r_a} {_readble_amount_name(amount)}!\nВ кошельке: {r_balance}',
+        text=f'{user_name}, + {r_a} {_readble_amount_name(amount)}!\nВ кошельке: {r_balance}',
         disable_notification=True
     )
     logger.log_extrainfo(f"Added {e.readble_amount(r_a)} to balance: {e.readble_amount(balance - amount)} -> {r_balance}")
@@ -190,7 +190,7 @@ def fart_noice_voice_message(message):
 
 @bot.message_handler(regexp='^(баланс)$')
 @bot.message_handler(commands=['balance'])
-def get_balance(message):
+def show_balance(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     amount = DB.get_balance(user_id)
     rAmount = e.readble_amount(amount)
@@ -241,7 +241,7 @@ def show_available_buff(message):
 
 @bot.message_handler(regexp='^(преколы)$')
 @bot.message_handler(commands=['prekoli'])
-def prekoli_info(message):
+def show_prekoli_info(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     user_level_buff = DB.get_level_buff(user_id)
     x = user_level_buff[2]
