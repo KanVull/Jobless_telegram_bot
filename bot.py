@@ -356,14 +356,15 @@ def buy_buff(message):
 @bot.message_handler(regexp='^(dice)$')
 @bot.message_handler(regexp='^(дайс)$')
 @bot.message_handler(commands=['dice'])
-def throw_dice(message):
+def buy_dice(message):
     chat_id, user_id, user_name = _get_chat_user_info(message)
     level, _, buff = DB.get_level_buff(user_id)
     pay_price = e.get_pay_price('dice', level, buff)
     if not DB.pay_balance(user_id, pay_price):
+        balance = DB.get_balance(user_id)
         bot.send_message(
             chat_id, 
-            text=f'Недостаточно средств для броска(\nСтоимость для твоего уровня: {e.readble_amount(pay_price)}', 
+            text=f'Нет преколов(\nНадо: {e.readble_amount(pay_price)}\nА у тебя: {e.readble_amount(balance)}', 
             disable_notification=True
         )
         logger.log_info(f'{user_name} doesn\'t have enough balance to dice')
@@ -408,11 +409,11 @@ def throw_dice(message):
             if value.value == 1:
                 bot.send_message(
                     chat_id, 
-                    text='Ну раз такое дело, пойду проверю, можешь ли ты добавить +1', 
+                    text='Выкинул +1', 
                     disable_notification=True
                 )
                 logger.log_extrainfo('Making +1 by rolling the dice')
-                _gamePlus1_add(str(message.from_user.id), message.chat.id, message.from_user.first_name)
+                _gamePlus1_add(user_id, chat_id, user_name)
             if value.value in [5, 6]:
                 _add_balance(user_id, chat_id, user_name, e.get_reward(f'dice{value.value}', level, buff))
 
@@ -440,21 +441,24 @@ def throw_dice(message):
                 _add_balance(user_id, chat_id, user_name, e.get_reward('soccer', level, buff))
                 logger.log_extrainfo('GOOOOOAL')
         case '🎳':
-            if value.value == 6:
-                bot.send_sticker(
-                    chat_id, 
-                    sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ',
-                    disable_notification=True
-                )
-                _add_balance(user_id, chat_id, user_name, e.get_reward('bowl', level, buff)) 
-                logger.log_extrainfo('Hit the strike') 
-            if value.value == 1:
-                bot.send_sticker(
-                    chat_id, 
-                    sticker='CAACAgIAAxkBAAP8YqX_AAENorYKnbSHVTh2Y0eonKqvAAJ4DwAC_jrxSFUDk4te2W5WJAQ',
-                    disable_notification=True
-                )
-                logger.log_extrainfo('Missed') 
+            match value.value:
+                case 6:
+                    bot.send_sticker(
+                        chat_id, 
+                        sticker='CAACAgIAAxkBAAEU8btipe_6kxUpjQG7OtXDzR8h9FMYkQACpAADZaIDLGZNvZNIbiHXJAQ',
+                        disable_notification=True
+                    )
+                    _add_balance(user_id, chat_id, user_name, e.get_reward('bowl', level, buff)) 
+                    logger.log_extrainfo('Hit the strike') 
+                case 1:
+                    bot.send_sticker(
+                        chat_id, 
+                        sticker='CAACAgIAAxkBAAP8YqX_AAENorYKnbSHVTh2Y0eonKqvAAJ4DwAC_jrxSFUDk4te2W5WJAQ',
+                        disable_notification=True
+                    )
+                    logger.log_extrainfo('Missed') 
+                case _:
+                    pass    
         case '🎰':
             if value.value == 64:
                 bot.send_message(
@@ -469,7 +473,7 @@ def throw_dice(message):
                 )
                 _add_balance(user_id, chat_id, user_name, e.get_reward('slots777', level, buff))
                 logger.log_extrainfo('Winning jackpot WOW') 
-            elif value.value in [43, 22, 1]:
+            elif value.value in [1, 22, 43]:
                 bot.send_message(
                     chat_id, 
                     text='Не Jackpot, но блин тоже круто',
@@ -482,14 +486,13 @@ def throw_dice(message):
                 )
                 _add_balance(user_id, chat_id, user_name, e.get_reward('slots', level, buff))
                 logger.log_extrainfo('Three in the row') 
-            else:
-                if _random([20]):
-                    bot.send_sticker(
-                        chat_id, 
-                        sticker='CAACAgIAAxkBAAEE6BpimgihzCGdTjyxel5uFJDZfqwI9AACjRMAArwbyUvBk3xJQsTnBSQE',
-                        disable_notification=True
-                    )
-                    logger.log_extrainfo('Nothing spetial')                       
+            elif value.value in [6, 11, 16, 17, 27, 32, 33, 38, 48, 49, 59]:
+                bot.send_sticker(
+                    chat_id, 
+                    sticker='CAACAgIAAxkBAAEE6BpimgihzCGdTjyxel5uFJDZfqwI9AACjRMAArwbyUvBk3xJQsTnBSQE',
+                    disable_notification=True
+                )
+                logger.log_extrainfo('Only first two of elements')                       
 
 
 ###################################################################
