@@ -62,7 +62,11 @@ def _gamePlus1_add(user_id: str, chat_id: str, user_name: str) -> None:
             message = 'слушай, я же тебя просил. Засчитываю последний раз.'
         case _:
             message = 'чел, (T_T) Жди других'            
-    bot.send_message(chat_id=chat_id, text=f'{user_name}, {message}')
+    bot.send_message(
+        chat_id=chat_id, 
+        text=f'{user_name}, {message}',
+        disable_notification=True
+    )
     
     logger.log_info(f'game +1 making for {user_name}')
     logger.log_extrainfo(f'score: {state[1]}')
@@ -83,9 +87,17 @@ def _gamePlus1_add(user_id: str, chat_id: str, user_name: str) -> None:
 
         if logger_message is not None:
             logger.log_extrainfo(logger_message)
-            bot.send_message(chat_id=chat_id, text=message)
+            bot.send_message(
+                chat_id=chat_id, 
+                text=message,
+                disable_notification=True
+            )
         if sticker_state is not None:
-            bot.send_sticker(chat_id=chat_id, sticker=sticker_state)
+            bot.send_sticker(
+                chat_id=chat_id, 
+                sticker=sticker_state,
+                disable_notification=True
+            )
 
 def _add_balance(user_id: str, chat_id: str, user_name: str, amount: float) -> None:
     DB.add_balance(user_id, amount)   
@@ -94,7 +106,7 @@ def _add_balance(user_id: str, chat_id: str, user_name: str, amount: float) -> N
     r_balance = e.readble_amount(balance)
     bot.send_message(
         chat_id=chat_id, 
-        text=f'{user_name}, кошелёк увеличен на {r_a} {_readble_amount_name(amount)}!\nВ кошельке: {r_balance}',
+        text=f'{user_name}, + кошелёк: {r_a} {_readble_amount_name(amount)}!\nВ кошельке: {r_balance}',
         disable_notification=True
     )
     logger.log_extrainfo(f"Added {e.readble_amount(r_a)} to balance: {e.readble_amount(balance - amount)} -> {r_balance}")
@@ -161,11 +173,11 @@ def echo(message):
         disable_notification=True
     )
 
-@bot.message_handler(regexp='(перд|пук|сру|сри|сра|срё|fart|дрист)')
+@bot.message_handler(regexp='(перд|пёрд|окак|акак|кек|пук|сру|сри|сра|срё|fart|дрист)')
 def fart_noice_voice_message(message):
     chat_id, _, user_name = _get_chat_user_info(message)
     fart = DB.random_fart()
-    logger.log_info(f'Farted for {user_name}')
+    logger.log_info(f'{user_name} farted (o_0)')
     bot.send_voice(
         chat_id, 
         voice=fart,
@@ -239,7 +251,9 @@ def prekoli_info(message):
         buff_info = f'Твой бафф: x{e.readble_amount(user_level_buff[2])}.'    
     bot.send_message(
         chat_id=chat_id,
-        text = f'''Преколы это внутриботовая валюта.
+        text =\
+              
+f'''Преколы это внутриботовая валюта.
 Свой баланс можно посмотреть командой "Баланс" или /balance.
 Её можно тратить на покупку уровня и азартную игру Дайс, где ты можешь выиграть преколов (или проиграть).
 Введи команду "Уровень" или /level, чтобы посмотреть информацию о данной системе.
@@ -255,7 +269,8 @@ def prekoli_info(message):
 - Голосовое или кружок: {e.readble_amount(e.get_reward('voice', user_level_buff[0], x))}
 - Стикер: {e.readble_amount(e.get_reward('sticker', user_level_buff[0], x))}
 
-Дайс стоит: {e.readble_amount(e.get_pay_price('dice', user_level_buff[0], x))}''',
+Дайс стоит: {e.readble_amount(e.get_pay_price('dice', user_level_buff[0], x))}''',\
+            
         disable_notification=True
     )
     logger.log_info(f'{user_name} enters Преколы')
