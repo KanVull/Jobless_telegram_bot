@@ -1,4 +1,5 @@
 from typing import List, Tuple
+import translators as ts
 import telebot
 import openai
 import random
@@ -233,6 +234,7 @@ def openChat_answer(message):
     logger.log_info(f'{user_name} asked ChatGPT')
 
     text = _remove_prefix(message.text, ['Батон,', 'батон,', 'бот,', 'Бот,','Baton,','baton,','bot,','Bot,'])
+    text = ts.translate_text(text.strip())
     answer = _generate_answer(text)
     response = answer or f'{user_name}, я сейчас сплю, напиши, когда проснусь\n(-_-)Zzzz'
     bot.reply_to(
