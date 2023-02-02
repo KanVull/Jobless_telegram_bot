@@ -40,7 +40,7 @@ class Economy:
         raw_cost = self._balance_rules['add'][type]
         return self._get_cost(raw_cost, player_level, buff)
 
-    def readble_amount(self, amount: float) -> str:
+    def readable_amount(self, amount: float) -> str:
         definition = [
             'k', 'M', 'B', 'T', 'q', 'Q', 's', 'S', 'O', 'N', 
             'D', 'UD', 'DD', 'TD', 'qD', 'QD', 'sD', 'SD', 'OD', 'ND', 
@@ -111,4 +111,4 @@ if __name__ == '__main__':
     #         reward_cost_diff *= 2
 
     #     print(f"{i} -> {level_cost} : {level_cost_diff:.02f}\t|\t{reward_cost_diff:.02f}\t|\t{1.0*level_cost_diff/reward_cost_diff:.02f}")  
-    print(e.readble_amount(12345678.123456789123456789123456789))
+    print(e.readable_amount(12345678.123456789123456789123456789))
