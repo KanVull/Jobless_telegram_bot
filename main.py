@@ -1,10 +1,10 @@
-from typing import List, Tuple
-import translators as ts
 import telebot
 import openai
+import translators as ts
+import configparser
 import random
 import time
-import configparser
+from typing import List, Tuple
 
 import logger
 import db_connect
